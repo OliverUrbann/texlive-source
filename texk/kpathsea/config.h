@@ -94,6 +94,10 @@
   This must be included after "c-proto.h"
   but before "lib.h". FP.
 */
+#if defined (__amigaos__) || defined (__amigaos4__) || defined (__MORPHOS__)
+#include <kpathsea/amiga.h>
+#endif
+
 #if defined (WIN32) || defined (_WIN32)
 #ifdef __MINGW32__
 #include <kpathsea/mingw32.h>

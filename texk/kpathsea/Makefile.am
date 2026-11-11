@@ -159,6 +159,7 @@ indirect_headers = \
 	hash.h \
 	knj.h \
 	lib.h \
+	amiga.h \
 	mingw32.h \
 	progname.h \
 	simpletypes.h \

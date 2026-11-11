@@ -3428,6 +3428,9 @@ void GlobalParams::debugLogPrintf(const char *fmt, ...) {
   t = time(NULL);
 #ifdef _WIN32
   localtime_s(&tm, &t);
+#elif defined(__ixemul__)
+  // ixemul.library (AmigaOS 3) has no localtime_r; single-threaded anyway.
+  tm = *localtime(&t);
 #else
   localtime_r(&t, &tm);
 #endif

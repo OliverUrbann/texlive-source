@@ -27,7 +27,13 @@
 #define FLOCKFILE(x)
 #define FUNLOCKFILE(x)
 
-#else /* not WIN32 */
+#elif defined (__ixemul__)
+/* ixemul.library (AmigaOS) has neither flockfile nor getc_unlocked,
+   and kpathsea programs are single-threaded there.  */
+#define FLOCKFILE(x)
+#define FUNLOCKFILE(x)
+
+#else /* not WIN32, not ixemul */
 /* By POSIX, getc() has to be thread-safe, which means (un)locking on
    every character read.  It is much faster to lock the stream (once),
    use getc_unlocked to read, and then unlock the stream.  We need to be
