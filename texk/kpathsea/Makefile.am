@@ -30,6 +30,7 @@ BUILT_SOURCES = paths.h
 libkpathsea_la_SOURCES = \
 	tex-file.c \
 	absolute.c \
+	amiga.c \
 	atou.c \
 	cnf.c \
 	concat.c \

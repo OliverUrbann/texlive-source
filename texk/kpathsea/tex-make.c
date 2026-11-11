@@ -191,6 +191,17 @@ maketex (kpathsea kpse, kpse_file_format_type format, string* args)
   strcat(fullbin, "\\");
   strcat(fullbin, args[0]);
 #endif
+#if defined (__ixemul__)
+  /* AmigaOS 3 with ixemul.library: no fork(), and the mktex* programs
+     are Unix shell scripts.  So do not try; the file is simply missing.
+     The build also sets --disable-mktex*-default.  AmigaOS 4/MorphOS
+     ports with a working shell could use the Unix code below.  */
+  (void) len; (void) fn; (void) format;
+  if (!kpse->make_tex_discard_errors)
+    fprintf (stderr, "\nkpathsea: cannot run %s on AmigaOS 3; "
+             "create the file by hand (see README.amiga).\n", args[0]);
+  return NULL;
+#endif
   if (!kpse->make_tex_discard_errors) {
     fprintf (stderr, "\nkpathsea: Running");
     for (s = &args[0]; *s != NULL; s++)

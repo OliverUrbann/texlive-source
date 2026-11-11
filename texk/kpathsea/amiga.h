@@ -28,6 +28,9 @@
 #ifndef ftello
 #define ftello ftell
 #endif
+/* amiga.c: the program's directory in Unix form ("/Work/TeX/bin"),
+   from AmigaDOS, or NULL.  Used by kpathsea_selfdir.  */
+extern char *kpathsea_amiga_progdir (void);
 #endif /* __ixemul__ */
 
 #endif /* not KPATHSEA_AMIGA_H */

@@ -321,6 +321,12 @@ kpathsea_selfdir (kpathsea kpse, const_string argv0)
   string ret;
   string self = NULL;
 
+#if defined (__ixemul__)
+  ret = kpathsea_amiga_progdir ();
+  if (ret)
+    return ret;
+#endif
+
   if (kpathsea_absolute_p (kpse, argv0, true)) {
     self = xstrdup (argv0);
   } else {
@@ -492,6 +498,22 @@ kpathsea_set_program_name (kpathsea kpse,  const_string argv0,
   if (s) {
     kpse->debug |= atoi (s);
   }
+
+#if defined (__ixemul__)
+  /* As on Windows: KPATHSEA_DEBUG_OUTPUT names a file for stderr.  The
+     AmigaOS 3.1 Shell cannot redirect stderr (no *>), so this is the
+     only way to get debug output into a file.  */
+  {
+    string debug_output = getenv ("KPATHSEA_DEBUG_OUTPUT");
+    if (debug_output && *debug_output) {
+      boolean append = getenv ("KPATHSEA_DEBUG_APPEND") != NULL;
+      if (!freopen (debug_output, append ? "a" : "w", stderr))
+        perror (debug_output);
+      else if (!append)
+        kpathsea_xputenv (kpse, "KPATHSEA_DEBUG_APPEND", "yes");
+    }
+  }
+#endif
 
 #if defined(WIN32)
   cp = AreFileApisANSI() ? GetACP() : GetOEMCP();

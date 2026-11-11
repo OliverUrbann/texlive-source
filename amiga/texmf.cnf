@@ -1,0 +1,27 @@
+% texmf.cnf for AmigaOS 3 -- overrides for TeX Live's defaults.
+%
+% Install this file as TeX:texmf.cnf, i.e. in the root of the TeX tree,
+% next to bin/ and texmf-dist/.  kpathsea reads it before
+% texmf-dist/web2c/texmf.cnf, and the first value found wins.
+%
+% TeX Live's defaults allocate well over 100 MB at startup.  The values
+% below need about 32 MB and are enough for ordinary LaTeX documents.
+% With more RAM (e.g. a Vampire) raise them; after changing main_memory,
+% hash_extra, trie_size or hyph_size the formats must be rebuilt.
+
+main_memory = 2500000     % words of 8 bytes: 20 MB; building the LaTeX
+                          % format needs about 2000000
+extra_mem_top = 0
+extra_mem_bot = 0
+font_mem_size = 1000000   % words of 4 bytes: 4 MB
+font_max = 2000
+hash_extra = 100000
+pool_size = 1500000
+string_vacancies = 90000
+max_strings = 150000
+pool_free = 47500
+buf_size = 200000
+trie_size = 400000        % enough for a few languages; all of
+                          % language.dat needs about 1100000
+save_size = 100000
+stack_size = 5000

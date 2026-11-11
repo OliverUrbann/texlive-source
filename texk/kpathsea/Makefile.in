@@ -208,6 +208,7 @@ am_libkpathsea_la_OBJECTS = libkpathsea_la-tex-file.lo \
 	libkpathsea_la-magstep.lo libkpathsea_la-make-suffix.lo \
 	libkpathsea_la-path-elt.lo libkpathsea_la-pathsearch.lo \
 	libkpathsea_la-proginit.lo libkpathsea_la-progname.lo \
+	libkpathsea_la-amiga.lo \
 	libkpathsea_la-readable.lo libkpathsea_la-rm-suffix.lo \
 	libkpathsea_la-str-list.lo libkpathsea_la-str-llist.lo \
 	libkpathsea_la-tex-glyph.lo libkpathsea_la-tex-hush.lo \
@@ -296,6 +297,7 @@ am__depfiles_remade = $(DEPDIR)/putenv.Plo ./$(DEPDIR)/access.Po \
 	./$(DEPDIR)/libkpathsea_la-pathsearch.Plo \
 	./$(DEPDIR)/libkpathsea_la-proginit.Plo \
 	./$(DEPDIR)/libkpathsea_la-progname.Plo \
+	./$(DEPDIR)/libkpathsea_la-amiga.Plo \
 	./$(DEPDIR)/libkpathsea_la-readable.Plo \
 	./$(DEPDIR)/libkpathsea_la-rm-suffix.Plo \
 	./$(DEPDIR)/libkpathsea_la-str-list.Plo \
@@ -780,7 +782,7 @@ libkpathsea_la_CPPFLAGS = $(AM_CPPFLAGS) -DMAKE_KPSE_DLL \
 libkpathsea_la_LDFLAGS = -bindir @bindir@ -no-undefined -version-info $(KPSE_LT_VERSINFO)
 libkpathsea_la_LIBADD = $(LTLIBOBJS)
 BUILT_SOURCES = paths.h
-libkpathsea_la_SOURCES = tex-file.c absolute.c atou.c cnf.c concat.c \
+libkpathsea_la_SOURCES = tex-file.c absolute.c amiga.c atou.c cnf.c concat.c \
 	concat3.c concatn.c db.c debug.c dir.c elt-dirs.c expand.c \
 	extend-fname.c file-p.c find-suffix.c fn.c fontmap.c hash.c \
 	kdefault.c kpathsea.c line.c magstep.c make-suffix.c \
@@ -1085,6 +1087,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-pathsearch.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-proginit.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-progname.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-amiga.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-readable.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-rm-suffix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libkpathsea_la-str-list.Plo@am__quote@ # am--include-marker
@@ -1335,6 +1338,13 @@ libkpathsea_la-progname.lo: progname.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='progname.c' object='libkpathsea_la-progname.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkpathsea_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libkpathsea_la-progname.lo `test -f 'progname.c' || echo '$(srcdir)/'`progname.c
+
+libkpathsea_la-amiga.lo: amiga.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkpathsea_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libkpathsea_la-amiga.lo -MD -MP -MF $(DEPDIR)/libkpathsea_la-amiga.Tpo -c -o libkpathsea_la-amiga.lo `test -f 'amiga.c' || echo '$(srcdir)/'`amiga.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libkpathsea_la-amiga.Tpo $(DEPDIR)/libkpathsea_la-amiga.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='amiga.c' object='libkpathsea_la-amiga.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkpathsea_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libkpathsea_la-amiga.lo `test -f 'amiga.c' || echo '$(srcdir)/'`amiga.c
 
 libkpathsea_la-readable.lo: readable.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libkpathsea_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libkpathsea_la-readable.lo -MD -MP -MF $(DEPDIR)/libkpathsea_la-readable.Tpo -c -o libkpathsea_la-readable.lo `test -f 'readable.c' || echo '$(srcdir)/'`readable.c
@@ -2223,6 +2233,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/libkpathsea_la-pathsearch.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-proginit.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-progname.Plo
+	-rm -f ./$(DEPDIR)/libkpathsea_la-amiga.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-readable.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-rm-suffix.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-str-list.Plo
@@ -2336,6 +2347,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/libkpathsea_la-pathsearch.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-proginit.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-progname.Plo
+	-rm -f ./$(DEPDIR)/libkpathsea_la-amiga.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-readable.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-rm-suffix.Plo
 	-rm -f ./$(DEPDIR)/libkpathsea_la-str-list.Plo
