@@ -9,7 +9,8 @@
 # native 32-bit compiler for LuaJIT, even though LuaJIT is not built:
 # install gcc-multilib (Debian/Ubuntu).
 #
-# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,kpsewhich}
+# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,bibtex,makeindex,
+#                                              kpsewhich,mktexlsr}
 #         <build-dir>/dist/TeX/texmf.cnf, <build-dir>/dist/TeX/texmf-dist/web2c/texmf.cnf
 # See amiga/README.amiga.md for what to add to make it a working TeX.
 set -e
@@ -69,12 +70,13 @@ if [ ! -f Makefile ]; then
 	"$src/configure" \
 		--host=m68k-amigaos --build="$("$src/build-aux/config.guess")" \
 		--disable-all-pkgs --enable-web2c --enable-tex --enable-pdftex \
+		--enable-makeindexk \
 		--disable-etex --disable-ptex --disable-eptex --disable-uptex \
 		--disable-euptex --disable-aleph --disable-hitex --disable-texprof \
 		--disable-xetex --disable-mf --disable-mf-nowin --disable-mflua \
 		--disable-mfluajit --disable-luatex --disable-luajittex \
 		--disable-luahbtex --disable-luajithbtex --disable-mp --disable-pmp \
-		--disable-upmp --disable-web-progs \
+		--disable-upmp \
 		--disable-mktexfmt-default --disable-mktexmf-default \
 		--disable-mktexpk-default --disable-mktextfm-default \
 		--disable-synctex --disable-tex-synctex --disable-pdftex-synctex \
@@ -95,14 +97,22 @@ echo "== build"
 	make -C texk -j"$jobs"
 } >make.log 2>&1 || { echo "build failed, see $build/cross/make.log" >&2; exit 1; }
 
+# mktexlsr replacement (the original is a shell script)
+echo "== mktexlsr"
+m68k-amigaos-gcc $flags -O2 -std=gnu17 -fgnu89-inline -DHAVE_CONFIG_H \
+	-Itexk -I"$src/texk" -o mktexlsr "$src/amiga/mktexlsr.c" \
+	texk/kpathsea/.libs/libkpathsea.a >>make.log 2>&1 ||
+	{ echo "mktexlsr failed, see $build/cross/make.log" >&2; exit 1; }
+
 # ---- 4. collect --------------------------------------------------------
 dist=$build/dist/TeX
 mkdir -p "$dist/bin/m68k-amigaos" "$dist/texmf-dist/web2c"
-for p in texk/web2c/tex texk/web2c/pdftex texk/kpathsea/kpsewhich; do
+for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/bibtex \
+	texk/makeindexk/makeindex texk/kpathsea/kpsewhich mktexlsr; do
 	m68k-amigaos-strip -o "$dist/bin/m68k-amigaos/$(basename $p)" $p
 done
 cp "$src/texk/kpathsea/texmf.cnf" "$dist/texmf-dist/web2c/texmf.cnf"
 cp "$src/amiga/texmf.cnf" "$dist/texmf.cnf"
-cp "$src/amiga/README.amiga.md" "$dist/README.amiga.md" 2>/dev/null || true
+cp "$src/amiga/README.amiga.md" "$src/amiga/Install" "$src/amiga/MakeFormats" "$dist/"
 echo "== done:"
 ls -l "$dist/bin/m68k-amigaos"

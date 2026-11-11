@@ -86,6 +86,34 @@ kpathsea_amiga_progdir (void)
   return ret;
 }
 
+/* ---- AmigaDOS path to Unix path ---------------------------------- */
+
+char *
+kpathsea_amiga_unix_path (const char *name)
+{
+  const char *colon;
+  char *ret;
+  size_t vol;
+
+  if (!name || !*name || *name == '-' || *name == '&' || *name == '\\'
+      || *name == '*' || *name == '/' || *name == ':')
+    return NULL;
+  colon = strchr (name, ':');
+  if (!colon || memchr (name, '/', colon - name)
+      || memchr (name, ' ', colon - name))
+    return NULL;
+  vol = colon - name;
+  ret = (char *) xmalloc (strlen (name) + 3);
+  ret[0] = '/';
+  memcpy (ret + 1, name, vol);
+  ret[vol + 1] = '\0';
+  if (colon[1]) {
+    strcat (ret, "/");
+    strcat (ret, colon + 1);
+  }
+  return ret;
+}
+
 /* ---- Math ------------------------------------------------------------
 
    ixemul's libm.a is empty; the math lives in libc.a/ixemul.library and

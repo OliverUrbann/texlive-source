@@ -922,6 +922,18 @@ maininit (int ac, string *av)
     }
   }
 
+#if defined (__ixemul__)
+  /* AmigaOS 3 with ixemul: accept "Work:doc/paper.tex" as the file to
+     process and turn it into ixemul's Unix form "/Work/doc/paper.tex".
+     Otherwise TeX would take "Work:doc/paper" as the job name and
+     kpathsea would see the colon as a path separator.  */
+  if (argc > 1) {
+    string unix_name = kpathsea_amiga_unix_path (argv[argc-1]);
+    if (unix_name)
+      argv[argc-1] = unix_name;
+  }
+#endif
+
   /* Were we given a simple filename? */
   main_input_file = get_input_file_name ();
 

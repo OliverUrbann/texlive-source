@@ -1,0 +1,29 @@
+; MakeFormats: build the TeX formats on the Amiga.
+; Run it from the root of the TeX tree:   Execute MakeFormats
+; (TeX Live's fmtutil is a Unix script and cannot run here.)
+; The LaTeX format takes a while: minutes on a fast 68060/Vampire,
+; much longer on a 68030.
+FailAt 21
+Path bin/m68k-amigaos ADD
+If NOT EXISTS texmf-var
+  MakeDir texmf-var
+EndIf
+If NOT EXISTS texmf-var/web2c
+  MakeDir texmf-var/web2c
+EndIf
+If NOT EXISTS texmf-var/web2c/pdftex
+  MakeDir texmf-var/web2c/pdftex
+EndIf
+If NOT EXISTS texmf-var/web2c/tex
+  MakeDir texmf-var/web2c/tex
+EndIf
+CD texmf-var/web2c/pdftex
+Echo "== pdflatex.fmt"
+pdftex -ini -interaction=batchmode -jobname=pdflatex -progname=pdflatex -translate-file=cp227.tcx -etex pdflatex.ini
+Echo "== pdftex.fmt"
+pdftex -ini -interaction=batchmode -jobname=pdftex -progname=pdftex -translate-file=cp227.tcx -etex pdfetex.ini
+CD /tex
+Echo "== tex.fmt"
+tex -ini -interaction=batchmode tex.ini
+CD ///
+mktexlsr

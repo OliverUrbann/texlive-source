@@ -1,0 +1,17 @@
+; Install: run once from the root of the TeX tree:   Execute Install
+; Creates the command "pdflatex" (pdftex under another name: the program
+; picks its format by the name it is called with) and the file name
+; databases.  Then run:  Execute MakeFormats
+FailAt 21
+CD bin/m68k-amigaos
+If NOT EXISTS pdflatex
+  MakeLink pdflatex pdftex HARD
+  If NOT EXISTS pdflatex
+    ; file system without hard links
+    Copy pdftex pdflatex
+  EndIf
+EndIf
+CD //
+bin/m68k-amigaos/mktexlsr
+Echo "Add this line to S:User-Startup (adjust the path):"
+Echo "  Path Work:TeX/bin/m68k-amigaos ADD"
