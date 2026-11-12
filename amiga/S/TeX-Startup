@@ -4,7 +4,20 @@ If EXISTS S:Shell-Startup
   Execute S:Shell-Startup
 EndIf
 Execute TeX:S/TeX-Assigns
-; files unpacked into texmf-local (fonts, packages) are found right away
+; files unpacked into texmf-local (fonts, packages) are found right away;
+; mktexlsr returns WARN when it found new or removed files
 TeX:bin/m68k-amigaos/mktexlsr --if-changed TeX:texmf-local
+If WARN
+  Set TeXFontList update
+EndIf
+; LuaLaTeX's font list: built once, and again after changes in texmf-local
+If NOT EXISTS TeX:texmf-var/luatex-cache/generic/names/luaotfload-names.luc.gz
+  Set TeXFontList update
+EndIf
+If "$TeXFontList" EQ "update"
+  Echo "Updating the font list for LuaLaTeX (a minute on a fast Amiga, more on a 68030) ..."
+  TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:texmf-dist/scripts/luaotfload/luaotfload-tool.lua --update >NIL:
+  UnSet TeXFontList
+EndIf
 Echo "TeX Live for AmigaOS 3:  pdflatex  lualatex  bibtex  makeindex  tex"
 Echo "Documents can be anywhere; CD there first.  Help: TeX:ReadMe"

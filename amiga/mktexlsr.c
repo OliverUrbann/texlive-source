@@ -8,7 +8,8 @@
    Without DIR, the directories of kpathsea's TEXMFDBS are used, as with
    the original.  Directories that do not exist are skipped.
    --if-changed (or -c): leave an ls-R alone if it is already up to
-   date, and say nothing then.  The TeX-Shell runs
+   date, and say nothing then.  The exit status is 5 (WARN on AmigaOS)
+   if an ls-R was written, 0 if all were up to date.  The TeX-Shell runs
    "mktexlsr --if-changed TeX:texmf-local" at every start, so that files
    unpacked there are found without further ado.
 
@@ -24,6 +25,7 @@
 #include <kpathsea/variable.h>
 
 static int if_changed = 0;
+static int updated = 0;   /* an ls-R was written */
 
 static const char magic[] =
   "% ls-R -- filename database for kpathsea; do not change this line.";
@@ -164,6 +166,7 @@ do_tree (const char *root)
     perror (name);
     return 1;
   }
+  updated = 1;
   if (if_changed)
     printf ("mktexlsr: updated %s (%lu entries).\n", name, count);
   else
@@ -221,5 +224,7 @@ main (int argc, char **argv)
   }
   if (status == 0 && !if_changed)
     printf ("mktexlsr: Done.\n");
+  if (status == 0 && if_changed && updated)
+    return 5;
   return status;
 }

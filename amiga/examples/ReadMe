@@ -2,12 +2,16 @@ Examples / Beispiele. In the TeX-Shell:
 
   CD TeX:examples
   pdflatex hello.tex
-  pdflatex paper.tex     then: bibtex paper, makeindex paper, pdflatex paper.tex (twice)
+  pdflatex paper.tex     then: bibtex paper, makeindex paper,
+                         pdflatex paper.tex (twice)
   pdflatex tikz.tex
   pdflatex thesis.tex    then: bibtex thesis, pdflatex thesis.tex (twice)
   pdflatex slides.tex
   lualatex unicode.tex
-  lualatex languages.tex (needs the four font add-ons TeX-Fonts-*.lha)
+  lualatex languages.tex (needs TeX-Fonts-Europe.lha, 256 MB)
+  lualatex arabic.tex    (needs TeX-Fonts-Arabic-Hebrew.lha)
+  lualatex hindi.tex     (needs TeX-Fonts-Asia-Africa.lha)
+  lualatex chinese.tex   (needs TeX-Fonts-CJK.lha, 256 MB)
 
-The first lualatex run builds the font list and takes a few minutes.
-Der erste lualatex-Lauf legt die Schriftenliste an und dauert einige Minuten.
+The first use of a font in lualatex takes a while (it builds a cache).
+Der erste Gebrauch einer Schrift in lualatex dauert etwas (Zwischenspeicher).

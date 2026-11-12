@@ -1,24 +1,18 @@
-% lualatex languages.tex -- needs the font add-ons TeX-Fonts-*.lha (all four).
+% lualatex languages.tex -- needs the font add-on TeX-Fonts-Europe.lha.
+% Five languages, one font (CMU = Computer Modern Unicode). Each language
+% gets its own hyphenation. With babel, every language loads the font
+% anew (other script, other features), so a light font matters: with
+% FreeSerif this document needs too much memory for the Amiga.
 \documentclass{article}
-\usepackage[bidi=basic]{babel}
+\usepackage{babel}
 \babelprovide[import, main]{german}
 \babelprovide[import]{russian}
 \babelprovide[import]{greek}
 \babelprovide[import]{polish}
 \babelprovide[import]{french}
-\babelprovide[import]{hebrew}
-\babelprovide[import]{arabic}
-\babelprovide[import]{hindi}
-\babelprovide[import]{thai}
-\babelprovide[import]{chinese}
-\babelfont{rm}{FreeSerif}
-\babelfont[hebrew]{rm}[Renderer=HarfBuzz]{NotoSerifHebrew-Regular.ttf}
-\babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri-Regular.ttf}
-\babelfont[hindi]{rm}[Renderer=HarfBuzz]{NotoSerifDevanagari-Regular.ttf}
-\babelfont[thai]{rm}[Renderer=HarfBuzz]{NotoSerifThai-Regular.ttf}
-\babelfont[chinese]{rm}{DroidSansFallbackFull.ttf}
+\babelfont{rm}{CMU Serif}
 \begin{document}
-\section{Viele Sprachen}
+\section{Mehrere Sprachen}
 Deutsch: Donaudampfschifffahrtsgesellschaftskapitän.
 
 \foreignlanguage{russian}{Русский: Достопримечательности государственного университета.}
@@ -28,16 +22,6 @@ Deutsch: Donaudampfschifffahrtsgesellschaftskapitän.
 \foreignlanguage{polish}{Polski: Zażółć gęślą jaźń, konstantynopolitańczykowianeczka.}
 
 \foreignlanguage{french}{Français : anticonstitutionnellement, cœur, élève.}
-
-\foreignlanguage{hebrew}{עברית: שלום עולם}
-
-\foreignlanguage{arabic}{العربية: مرحبا بالعالم}
-
-\foreignlanguage{hindi}{हिन्दी: नमस्ते दुनिया}
-
-\foreignlanguage{thai}{ภาษาไทย: สวัสดีชาวโลก}
-
-\foreignlanguage{chinese}{中文：你好，世界。这是一个测试。}
 
 \showhyphens{\selectlanguage{russian}Достопримечательности}
 \showhyphens{\selectlanguage{polish}konstantynopolitańczykowianeczka}

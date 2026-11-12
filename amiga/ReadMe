@@ -4,7 +4,7 @@ TeX Live für AmigaOS 3 / TeX Live for AmigaOS 3
 DEUTSCH
 
 Installation
-  Das Archiv irgendwo auspacken, wo etwa 520 MB frei sind:
+  Das Archiv irgendwo auspacken, wo etwa 540 MB frei sind:
     LhA x TeXLive-Amiga.lha Work:
   Es entsteht das Verzeichnis "TeX". Mehr ist nicht zu tun: es wird nichts
   ins System kopiert, Formate und Dateidatenbanken liegen fertig bei.
@@ -27,10 +27,10 @@ TeX in jeder Shell
 
 Voraussetzungen
   68020 oder besser, AmigaOS 3.x. Speicher: pdfLaTeX etwa 40 MB, LuaLaTeX
-  etwa 128 MB. Mitgeliefert wird ixemul.library 80.1 (in TeX/Libs, wird
-  von der TeX-Shell gefunden). Liegt in LIBS: eine ältere ixemul.library,
-  meldet die TeX-Shell das; dann TeX/Libs/ixemul.library und
-  ixnet.library nach LIBS: kopieren.
+  128 MB, mit großen Schriften 256 MB. Mitgeliefert wird
+  ixemul.library 80.1 (in TeX/Libs, wird von der TeX-Shell gefunden).
+  Liegt in LIBS: eine ältere ixemul.library, meldet die TeX-Shell das;
+  dann TeX/Libs/ixemul.library und ixnet.library nach LIBS: kopieren.
 
   Getestet im Emulator (FS-UAE, Kickstart 3.1, 68030), noch nicht auf
   echter Hardware.
@@ -46,8 +46,10 @@ Enthalten
   Nicht enthalten: biber (ein Perl-Programm; biblatex mit backend=bibtex
   verwenden), XeTeX, Metafont, MetaPost, dvips.
 
-  Der erste Lauf von lualatex legt die Schriftenliste an und dauert
-  einige Minuten.
+  Beim ersten Start legt die TeX-Shell die Schriftenliste für lualatex
+  an (auf einem 68030 einige Minuten), danach nur, wenn in texmf-local
+  Dateien dazugekommen sind. Der erste Gebrauch einer Schrift in
+  lualatex dauert ebenfalls etwas länger (Zwischenspeicher).
 
 Sprachen
   Mit lualatex gehen alle Sprachen, die TeX Live kennt: Silbentrennung
@@ -56,8 +58,8 @@ Sprachen
     \usepackage[bidi=basic]{babel}
     \babelprovide[import, main]{german}
     \babelprovide[import]{russian}
-    \babelfont{rm}{FreeSerif}
-  Siehe TeX/examples/languages.tex.
+    \babelfont{rm}{CMU Serif}
+  Siehe TeX/examples/languages.tex, arabic.tex, hindi.tex, chinese.tex.
 
   Gebraucht wird dazu nur eine Schrift, die die Zeichen der Sprache
   enthält. Im Grundpaket ist Latin Modern (lateinische Schrift). Weitere
@@ -77,8 +79,8 @@ Schriften nachinstallieren
   Grundpaket, also
     LhA x TeX-Fonts-Europe.lha Work:
   Die Schriften landen in TeX/texmf-local. Die TeX-Shell bemerkt neue
-  Dateien beim nächsten Start selbst; in einer schon offenen TeX-Shell
-  "mktexlsr TeX:texmf-local" aufrufen.
+  Dateien beim nächsten Start selbst und erneuert die Schriftenliste;
+  also danach einfach eine neue TeX-Shell öffnen.
 
     TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
                             Unicode): Latein, Griechisch, Kyrillisch
@@ -92,12 +94,23 @@ Schriften nachinstallieren
                             Koreanisch (eine Schrift für alle drei,
                             ohne Fett und Kursiv)
 
-  Arabisch, Hebräisch und die indischen Schriften brauchen
-  Renderer=HarfBuzz, z. B.
-    \babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri-Regular.ttf}
+  lualatex setzt hier mit HarfBuzz (eingestellt in
+  texmf-dist/tex/lualatex/config/fontspec.cfg). Das ist nötig: der
+  andere Weg (Renderer=Node) braucht beim ersten Laden großer Schriften
+  wie FreeSerif oder Amiri mehrere hundert MB, mit HarfBuzz sind es
+  wenige MB.
+
+  Speicher (getestet im Emulator):
+    128 MB  ein Schriftsystem, z. B. Russisch, Arabisch, Hindi
+    256 MB  Chinesisch (große Schrift), languages.tex (fünf Sprachen)
+  babel lädt die Schrift für jede Sprache neu. Für mehrere europäische
+  Sprachen deshalb CMU Serif nehmen; FreeSerif ist viel größer und
+  reicht für ein, zwei Sprachen pro Dokument. Viele Schriftsysteme in
+  einem Dokument brauchen mehr, als lualatex auf dem Amiga bekommt.
 
   Jede andere OpenType- oder TrueType-Schrift geht genauso: nach
-  TeX/texmf-local/fonts/opentype/ (oder truetype/) kopieren, mktexlsr.
+  TeX/texmf-local/fonts/opentype/ (oder truetype/) kopieren, neue
+  TeX-Shell öffnen.
 
   Beim ersten Gebrauch einer Schrift legt lualatex einen Zwischenspeicher
   an; das dauert bei großen Schriften (CJK) mehrere Minuten.
@@ -121,7 +134,7 @@ Mehr: TeX/README.amiga.md. Quelltext und Build-Skripte:
 ENGLISH
 
 Installation
-  Unpack the archive anywhere with about 520 MB free:
+  Unpack the archive anywhere with about 540 MB free:
     LhA x TeXLive-Amiga.lha Work:
   This creates the drawer "TeX". That is all: nothing is copied into the
   system, formats and file name databases are included.
@@ -144,9 +157,10 @@ TeX in every Shell
 
 Requirements
   68020 or better, AmigaOS 3.x. Memory: pdfLaTeX about 40 MB, LuaLaTeX
-  about 128 MB. ixemul.library 80.1 is included (in TeX/Libs, found by
-  the TeX-Shell). If LIBS: holds an older ixemul.library, the TeX-Shell
-  says so; then copy TeX/Libs/ixemul.library and ixnet.library to LIBS:.
+  128 MB, 256 MB with big fonts. ixemul.library 80.1 is included (in
+  TeX/Libs, found by the TeX-Shell). If LIBS: holds an older
+  ixemul.library, the TeX-Shell says so; then copy
+  TeX/Libs/ixemul.library and ixnet.library to LIBS:.
 
   Tested in an emulator (FS-UAE, Kickstart 3.1, 68030), not yet on real
   hardware.
@@ -162,7 +176,10 @@ Included
   Not included: biber (a Perl program; use biblatex with backend=bibtex),
   XeTeX, Metafont, MetaPost, dvips.
 
-  The first lualatex run builds the font list and takes a few minutes.
+  The first time it starts, the TeX-Shell builds the font list for
+  lualatex (several minutes on a 68030), afterwards only when files were
+  added to texmf-local. The first use of a font in lualatex also takes
+  longer (it builds a cache).
 
 Languages
   lualatex handles every language TeX Live knows: hyphenation for 84
@@ -171,8 +188,8 @@ Languages
     \usepackage[bidi=basic]{babel}
     \babelprovide[import, main]{english}
     \babelprovide[import]{russian}
-    \babelfont{rm}{FreeSerif}
-  See TeX/examples/languages.tex.
+    \babelfont{rm}{CMU Serif}
+  See TeX/examples/languages.tex, arabic.tex, hindi.tex, chinese.tex.
 
   All it needs is a font with the characters of the language. The base
   package has Latin Modern (Latin script). More fonts come as add-on
@@ -192,8 +209,8 @@ Adding fonts
   package:
     LhA x TeX-Fonts-Europe.lha Work:
   The fonts go into TeX/texmf-local. The TeX-Shell notices new files the
-  next time it starts; in a TeX-Shell that is already open, run
-  "mktexlsr TeX:texmf-local".
+  next time it starts and updates the font list; so just open a new
+  TeX-Shell afterwards.
 
     TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
                             Unicode): Latin, Greek, Cyrillic
@@ -207,11 +224,21 @@ Adding fonts
                             Korean (one font for all three, no bold or
                             italic)
 
-  Arabic, Hebrew and the Indic scripts need Renderer=HarfBuzz, e.g.
-    \babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri-Regular.ttf}
+  lualatex shapes text with HarfBuzz here (set in
+  texmf-dist/tex/lualatex/config/fontspec.cfg). This is necessary: the
+  other way (Renderer=Node) needs several hundred MB the first time it
+  reads a big font such as FreeSerif or Amiri; HarfBuzz needs a few MB.
+
+  Memory (tested in the emulator):
+    128 MB  one script, e.g. Russian, Arabic, Hindi
+    256 MB  Chinese (big font), languages.tex (five languages)
+  babel loads the font again for every language. So use CMU Serif for
+  several European languages; FreeSerif is much bigger and fine for one
+  or two languages per document. Many scripts in one document need more
+  than lualatex gets on the Amiga.
 
   Any other OpenType or TrueType font works the same way: copy it to
-  TeX/texmf-local/fonts/opentype/ (or truetype/), run mktexlsr.
+  TeX/texmf-local/fonts/opentype/ (or truetype/), open a new TeX-Shell.
 
   The first time a font is used, lualatex builds a cache for it; for big
   fonts (CJK) that takes several minutes.

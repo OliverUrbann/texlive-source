@@ -14,7 +14,7 @@ English) explains the use; this file is about the port itself.
 | Program | What it is for |
 |---|---|
 | `pdftex`, `pdflatex` | LaTeX to PDF, the usual 8-bit engine |
-| `luahbtex`, `lualatex` | Unicode input, OpenType/TrueType fonts, Lua; HarfBuzz shaping on request (`Renderer=HarfBuzz`), e.g. for Arabic |
+| `luahbtex`, `lualatex` | Unicode input, OpenType/TrueType fonts, Lua; HarfBuzz shaping (the default here, see below) |
 | `luatex` | LuaTeX without HarfBuzz |
 | `tex` | Knuth's TeX, DVI output |
 | `bibtex` | bibliographies |
@@ -124,8 +124,14 @@ Latin script) and the Type 1 fonts of TeX Live. The add-ons put further
 OpenType/TrueType fonts into `texmf-local`, which is in kpathsea's search
 path before `texmf-dist`. The TeX-Shell runs `mktexlsr --if-changed
 TeX:texmf-local` at every start, which rewrites that `ls-R` only when
-files were added or removed; luaotfload rescans its font list by itself
-when a font is not found.
+files were added or removed (it then returns WARN). In that case, and
+when there is no font list yet, the TeX-Shell runs
+`luaotfload-tool --update`. luaotfload would try that by itself during a
+LuaLaTeX run, but on the Amiga that attempt never saves the list, so
+every font looked up by name then starts another search through all
+fonts; why it does not save is not known. Run from the TeX-Shell, the
+tool works (110 fonts of the base package in 92 s on the emulated
+68030 without JIT).
 
 The formats must be built by the Amiga programs: `Execute MakeFormats` in
 the drawer, on an Amiga or in an emulator. Then pack the drawer with LhA.
@@ -164,8 +170,28 @@ format is built, and that high-water mark stays in the format. Plain TeX
 needs far less; lower the values there if RAM is short.
 
 LuaTeX allocates as it goes. Building the LuaLaTeX format failed with
-64 MB and worked with 128 MB. The first LuaLaTeX run builds a font name
-database and caches each font it loads in `texmf-var/luatex-cache`.
+64 MB and worked with 128 MB. The first LuaLaTeX run caches each font it
+loads in `texmf-var/luatex-cache`.
+
+Fonts decide LuaLaTeX's memory use. With luaotfload's own shaper
+(`mode=node`) the first load of a big font turns all its tables into Lua
+tables: measured natively, FreeSerif took 709 MB, Amiri 599 MB. On the
+Amiga, Lua allocations start to fail at about 100 MB of Lua heap even
+with more RAM free, and luaotfload then reports the font as not found.
+With HarfBuzz (`mode=harf`) the font stays in HarfBuzz's compact form and
+needs a few MB. fontspec passes `mode=node` itself, so a luaotfload
+setting does not help; the package therefore installs
+`tex/lualatex/config/fontspec.cfg` (from `amiga/texmf/`) with
+`\defaultfontfeatures{Renderer=HarfBuzz}`. `Renderer=Node` in a document
+still works for small fonts.
+
+babel creates one font instance per language (different script and
+features), so a document with five languages loads its font five times:
+FreeSerif needed 394 MB natively for `examples/languages.tex`, CMU Serif
+163 MB. The example therefore uses CMU Serif. In FS-UAE with 128 MB
+Zorro III RAM, single-script documents work (FreeSerif Cyrillic, Amiri,
+Noto Sans Devanagari); `chinese.tex` (Droid Sans Fallback) and
+`languages.tex` need the 256 MB configuration.
 
 The stack is set to 512 KB in the programs themselves (`__stack` in
 `kpathsea/amiga.c`).

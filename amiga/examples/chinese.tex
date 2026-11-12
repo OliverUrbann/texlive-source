@@ -1,0 +1,9 @@
+% lualatex chinese.tex -- needs the font add-on TeX-Fonts-CJK.lha.
+% babel breaks the lines between the characters.
+\documentclass{article}
+\usepackage{babel}
+\babelprovide[import, main]{chinese}
+\babelfont{rm}{DroidSansFallbackFull.ttf}
+\begin{document}
+你好，世界。这是一个测试。这是在阿米加电脑上排版的中文文本，babel 会在汉字之间自动换行，所以长句子也能正确地分行显示。
+\end{document}

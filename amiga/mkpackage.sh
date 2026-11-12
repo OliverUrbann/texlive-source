@@ -78,6 +78,10 @@ if [ -n "$LANG_FULL" ]; then
 	cp "$LANG_FULL/language.dat" "$LANG_FULL/language.def" "$pkg/texmf-dist/tex/luatex/config/"
 	cp "$LANG_FULL/language.dat.lua" "$pkg/texmf-dist/tex/generic/config/"
 fi
+# LuaLaTeX: shape with HarfBuzz by default (much less memory); found
+# before fontspec's own fontspec.cfg, see the comment in the file
+mkdir -p "$pkg/texmf-dist/tex/lualatex/config"
+cp "$src/amiga/texmf/fontspec.cfg" "$pkg/texmf-dist/tex/lualatex/config/"
 if [ -n "$LANG_PDF" ]; then
 	cp "$LANG_PDF/language.dat" "$LANG_PDF/language.def" "$pkg/texmf-dist/tex/generic/config/"
 fi
@@ -91,6 +95,8 @@ echo "== TeX-Shell"
 iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/TeX-Shell" >"$pkg/TeX-Shell"
 python3 "$src/amiga/mkicon.py" "$pkg/TeX-Shell.info"
 mkdir -p "$pkg/S" "$pkg/texmf-local"
+# a file, so that its ls-R is not empty (kpathsea warns about an empty one)
+iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/texmf-local-ReadMe" >"$pkg/texmf-local/ReadMe"
 for f in TeX-Startup TeX-Assigns; do
 	iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/S/$f" >"$pkg/S/$f"
 done

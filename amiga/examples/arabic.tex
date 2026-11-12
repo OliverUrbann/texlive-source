@@ -1,0 +1,12 @@
+% lualatex arabic.tex -- needs the font add-on TeX-Fonts-Arabic-Hebrew.lha.
+\documentclass{article}
+\usepackage[bidi=basic]{babel}
+\babelprovide[import, main]{arabic}
+\babelprovide[import]{english}
+\babelfont{rm}{Amiri-Regular.ttf}
+\babelfont[english]{rm}{lmroman10-regular.otf}
+\begin{document}
+مرحبا بالعالم. هذا نص عربي مكتوب على حاسوب أميغا.
+
+\foreignlanguage{english}{Arabic, right to left, shaped by HarfBuzz.}
+\end{document}

@@ -1,0 +1,23 @@
+texmf-local: your own additions to TeX
+======================================
+
+Put packages and fonts here, in the same layout as in ../texmf-dist:
+
+  tex/latex/<package>/...        LaTeX packages
+  fonts/opentype/<name>/...      OpenType fonts (.otf)
+  fonts/truetype/<name>/...      TrueType fonts (.ttf)
+  bibtex/bst/..., bibtex/bib/... BibTeX styles and databases
+
+The font add-ons TeX-Fonts-*.lha unpack into this drawer.
+
+The TeX-Shell notices new files when it starts. In a TeX-Shell that is
+already open, run:   mktexlsr TeX:texmf-local
+
+Files here take precedence over those in texmf-dist.
+
+
+Eigene Ergänzungen: Pakete und Schriften hierher, mit derselben
+Verzeichnisstruktur wie in ../texmf-dist (siehe oben). Die
+Schrift-Zusatzarchive TeX-Fonts-*.lha werden hierher ausgepackt. Die
+TeX-Shell bemerkt neue Dateien beim Start; in einer schon offenen
+TeX-Shell: mktexlsr TeX:texmf-local
