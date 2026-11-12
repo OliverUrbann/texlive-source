@@ -1,0 +1,10 @@
+% lualatex unicode.tex   (the first run builds the font list: a few minutes)
+\documentclass{article}
+\usepackage{fontspec}
+\usepackage[ngerman]{babel}
+\begin{document}
+\section{Unicode mit Lua\LaTeX}
+UTF-8 direkt im Text: Größe, Äpfel, Übung, „Anführung“ – Gedankenstrich.
+Français : cœur, élève, naïve. Polski: zażółć gęślą jaźń.
+Ligaturen: fi fl ffi. Mathematik: $\int_0^1 x^2\,dx = \frac13$.
+\end{document}

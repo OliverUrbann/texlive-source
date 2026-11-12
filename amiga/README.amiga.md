@@ -93,7 +93,39 @@ The released package used the files of these Ubuntu packages of TeX Live
 2023, without documentation and sources: texlive-base, -latex-base,
 -latex-recommended, -latex-extra, -pictures, -fonts-recommended,
 -lang-german, -lang-greek, -luatex, -bibtex-extra, -science, lmodern,
-fonts-lmodern.
+fonts-lmodern; from the texlive-lang-* packages only the hyphenation
+files (`tex/generic/hyph-utf8`, the files the loaders read) and the babel
+language packages (`tex/generic/babel-*`).
+
+`amiga/mkfontaddons.sh` builds the font add-ons `TeX-Fonts-*.lha` from
+Debian/Ubuntu font packages (see the script for the list).
+
+## Languages and fonts
+
+All hyphenation patterns of TeX Live are in the base package, but only
+LuaLaTeX uses all of them:
+
+- `tex/luatex/config/language.dat` (and `.def`) list all 84 languages.
+  LuaLaTeX's search path has `tex/luatex` before `tex/generic`, so it
+  finds this file; babel assigns the languages when a document starts,
+  and LuaTeX loads the patterns of a language when it is first used.
+  `tex/generic/config/language.dat.lua` is the complete list as well.
+- `tex/generic/config/language.dat` lists English, German and Greek. It
+  is what pdfTeX reads when its formats are built, and pdfTeX puts the
+  patterns of every listed language into the format. With all languages
+  the pdfLaTeX format needs `trie_size = 1100000` and more memory.
+
+babel's language descriptions (`.ini` files, more than 380 languages)
+come with babel itself; the classic `babel-<language>` packages are
+included too.
+
+Fonts are the other half. The base package has Latin Modern (OpenType,
+Latin script) and the Type 1 fonts of TeX Live. The add-ons put further
+OpenType/TrueType fonts into `texmf-local`, which is in kpathsea's search
+path before `texmf-dist`. The TeX-Shell runs `mktexlsr --if-changed
+TeX:texmf-local` at every start, which rewrites that `ls-R` only when
+files were added or removed; luaotfload rescans its font list by itself
+when a font is not found.
 
 The formats must be built by the Amiga programs: `Execute MakeFormats` in
 the drawer, on an Amiga or in an emulator. Then pack the drawer with LhA.

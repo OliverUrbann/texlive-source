@@ -4,9 +4,13 @@
    Copyright 2026 Oliver Urbann.
    You may freely use, modify and/or distribute this file.
 
-   usage: mktexlsr [DIR...]
-   Without arguments, the directories of kpathsea's TEXMFDBS are used,
-   as with the original.  Directories that do not exist are skipped.
+   usage: mktexlsr [--if-changed] [DIR...]
+   Without DIR, the directories of kpathsea's TEXMFDBS are used, as with
+   the original.  Directories that do not exist are skipped.
+   --if-changed (or -c): leave an ls-R alone if it is already up to
+   date, and say nothing then.  The TeX-Shell runs
+   "mktexlsr --if-changed TeX:texmf-local" at every start, so that files
+   unpacked there are found without further ado.
 
    Plain C and kpathsea only; nothing here is specific to AmigaOS.  */
 
@@ -18,6 +22,8 @@
 #include <kpathsea/pathsearch.h>
 #include <kpathsea/progname.h>
 #include <kpathsea/variable.h>
+
+static int if_changed = 0;
 
 static const char magic[] =
   "% ls-R -- filename database for kpathsea; do not change this line.";
@@ -38,6 +44,26 @@ static int
 cmp (const void *a, const void *b)
 {
   return strcmp (*(char *const *) a, *(char *const *) b);
+}
+
+/* Nonzero if the files A and B have the same contents.  */
+static int
+same_file (const char *a, const char *b)
+{
+  FILE *fa = fopen (a, "rb"), *fb = fopen (b, "rb");
+  int same = fa && fb;
+  while (same) {
+    int ca = getc (fa), cb = getc (fb);
+    if (ca != cb)
+      same = 0;
+    else if (ca == EOF)
+      break;
+  }
+  if (fa)
+    fclose (fa);
+  if (fb)
+    fclose (fb);
+  return same;
 }
 
 /* Write the listing of ROOT/REL (REL is "." or "./a/b") and recurse.  */
@@ -62,6 +88,12 @@ list_dir (FILE *out, const char *root, const char *rel, unsigned long *count)
     /* like the original: skip version control directories */
     if (strcmp (e->d_name, ".git") == 0 || strcmp (e->d_name, ".svn") == 0)
       continue;
+    /* our own files: the temporary one is left out, ls-R itself is
+       added below whether it exists yet or not, so that the listing
+       does not change between the first and the second run */
+    if (strcmp (rel, ".") == 0 && (strcmp (e->d_name, "ls-R.tmp") == 0
+                                   || strcmp (e->d_name, "ls-R") == 0))
+      continue;
     full = concat3 (path, "/", e->d_name);
     add (&files, e->d_name);
     if (stat (full, &st) == 0 && S_ISDIR (st.st_mode))
@@ -70,6 +102,8 @@ list_dir (FILE *out, const char *root, const char *rel, unsigned long *count)
   }
   closedir (d);
   free (path);
+  if (strcmp (rel, ".") == 0)
+    add (&files, "ls-R");
 
   qsort (files.v, files.n, sizeof (char *), cmp);
   qsort (dirs.v, dirs.n, sizeof (char *), cmp);
@@ -108,8 +142,10 @@ do_tree (const char *root)
     perror (tmp);
     return 1;
   }
-  printf ("mktexlsr: Updating %s...\n", name);
-  fflush (stdout);
+  if (!if_changed) {
+    printf ("mktexlsr: Updating %s...\n", name);
+    fflush (stdout);
+  }
   fputs (magic, out);
   fputs ("\n", out);
   list_dir (out, root, ".", &count);
@@ -117,12 +153,21 @@ do_tree (const char *root)
     perror (tmp);
     return 1;
   }
+  if (if_changed && same_file (tmp, name)) {
+    remove (tmp);
+    free (name);
+    free (tmp);
+    return 0;
+  }
   remove (name);
   if (rename (tmp, name) != 0) {
     perror (name);
     return 1;
   }
-  printf ("mktexlsr: %lu entries.\n", count);
+  if (if_changed)
+    printf ("mktexlsr: updated %s (%lu entries).\n", name, count);
+  else
+    printf ("mktexlsr: %lu entries.\n", count);
   free (name);
   free (tmp);
   return 0;
@@ -131,12 +176,18 @@ do_tree (const char *root)
 int
 main (int argc, char **argv)
 {
-  int status = 0, i;
+  int status = 0, i, first = 1;
 
   kpse_set_program_name (argv[0], "mktexlsr");
 
-  if (argc > 1) {
-    for (i = 1; i < argc; i++) {
+  if (argc > 1 && (strcmp (argv[1], "--if-changed") == 0
+                   || strcmp (argv[1], "-c") == 0)) {
+    if_changed = 1;
+    first = 2;
+  }
+
+  if (argc > first) {
+    for (i = first; i < argc; i++) {
       char *dir = argv[i];
 #if defined (__ixemul__)
       char *u = kpathsea_amiga_unix_path (dir);   /* Work:TeX/texmf-dist */
@@ -168,7 +219,7 @@ main (int argc, char **argv)
       free (dir);
     }
   }
-  if (status == 0)
+  if (status == 0 && !if_changed)
     printf ("mktexlsr: Done.\n");
   return status;
 }

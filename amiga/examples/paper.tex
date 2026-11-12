@@ -1,0 +1,40 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{makeidx}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\makeindex
+\title{Ein Testpapier für den Amiga}
+\author{Jörg Müller}
+\begin{document}
+\maketitle
+\begin{abstract}Größere Umlaute: äöüß ÄÖÜ. Silbentrennung: Donaudampfschifffahrtsgesellschaftskapitän.\end{abstract}
+\tableofcontents
+\section{Einleitung}\label{sec:intro}
+Siehe \citet{knuth84} und \cite{lamport86,mueller20}. \index{Knuth}\index{Amiga!Vampire}
+Abschnitt~\ref{sec:math} auf Seite~\pageref{sec:math}.
+\begin{figure}[ht]\centering\includegraphics[width=4cm]{img}\caption{Ein Bild}\end{figure}
+\section{Mathematik}\label{sec:math}
+\begin{align}
+  \nabla\cdot\mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+  \int_{-\infty}^{\infty} e^{-x^2}\,dx &= \sqrt{\pi}
+\end{align}
+Die Geschwindigkeit beträgt \SI{3.0e8}{\metre\per\second}.\index{Geschwindigkeit}
+\begin{table}[ht]\centering
+\begin{tabular}{lrr}\toprule Modell & CPU & RAM \\\midrule A1200 & 68020 & \SI{2}{\mega\byte} \\ V4SA & 68080 & \SI{512}{\mega\byte} \\\bottomrule\end{tabular}
+\caption{Rechner}\end{table}
+\begin{lstlisting}[language=C,basicstyle=\ttfamily\small]
+int main(void) { printf("Hello\n"); return 0; }
+\end{lstlisting}
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\printindex
+\end{document}

@@ -1,0 +1,21 @@
+\documentclass[a4paper,12pt]{scrreprt}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage{csquotes}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\addbibresource{refs.bib}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\begin{document}
+\title{Eine Abschlussarbeit}\author{Anna Schäfer}\maketitle
+\tableofcontents
+\chapter{Einführung}
+\enquote{Zitat} nach \cite{knuth84}, siehe auch \textcite{lamport86}.
+\section{Grundlagen}
+\[ E = mc^2 \]
+\chapter{Ergebnisse}
+Text \autocite{mueller20}.
+\printbibliography
+\end{document}

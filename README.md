@@ -12,6 +12,13 @@ has a ready package with the programs, a texmf tree from TeX Live 2023
 formats. Unpack it anywhere, double-click `TeX-Shell`, and run
 `pdflatex`, `lualatex`, `bibtex`, `makeindex`.
 
+**Languages:** with `lualatex`, hyphenation for all 84 languages of TeX
+Live and babel's descriptions of more than 380 languages are included.
+Fonts for other scripts come as small add-on archives on the same page
+(`TeX-Fonts-Europe`, `-Arabic-Hebrew`, `-Asia-Africa`, `-CJK`): unpack
+them where the package was unpacked. Any other OpenType/TrueType font
+can be dropped into `TeX/texmf-local` the same way.
+
 Status: tested in an emulator (FS-UAE, Kickstart 3.1, 68030) against the
 output of TeX Live on Linux; not yet tested on real hardware.
 

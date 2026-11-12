@@ -4,5 +4,7 @@ If EXISTS S:Shell-Startup
   Execute S:Shell-Startup
 EndIf
 Execute TeX:S/TeX-Assigns
+; files unpacked into texmf-local (fonts, packages) are found right away
+TeX:bin/m68k-amigaos/mktexlsr --if-changed TeX:texmf-local
 Echo "TeX Live for AmigaOS 3:  pdflatex  lualatex  bibtex  makeindex  tex"
 Echo "Documents can be anywhere; CD there first.  Help: TeX:ReadMe"

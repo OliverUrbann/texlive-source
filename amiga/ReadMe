@@ -40,7 +40,7 @@ Enthalten
   mktexlsr. Ein texmf-Baum aus TeX Live 2023 mit LaTeX, KOMA-Script,
   TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
   hyperref, Latin Modern und den Sammlungen latex-extra und science;
-  Silbentrennung für Deutsch, Englisch und Griechisch. Fertige Formate für
+  Silbentrennung für 84 Sprachen (lualatex). Fertige Formate für
   pdflatex, pdftex, tex und lualatex.
 
   Nicht enthalten: biber (ein Perl-Programm; biblatex mit backend=bibtex
@@ -49,10 +49,64 @@ Enthalten
   Der erste Lauf von lualatex legt die Schriftenliste an und dauert
   einige Minuten.
 
+Sprachen
+  Mit lualatex gehen alle Sprachen, die TeX Live kennt: Silbentrennung
+  für 84 Sprachen und babel-Beschreibungen für über 380 Sprachen sind
+  enthalten. Beispiel:
+    \usepackage[bidi=basic]{babel}
+    \babelprovide[import, main]{german}
+    \babelprovide[import]{russian}
+    \babelfont{rm}{FreeSerif}
+  Siehe TeX/examples/languages.tex.
+
+  Gebraucht wird dazu nur eine Schrift, die die Zeichen der Sprache
+  enthält. Im Grundpaket ist Latin Modern (lateinische Schrift). Weitere
+  Schriften gibt es als Zusatzarchive (nächster Abschnitt).
+
+  pdflatex trennt nur Englisch, Deutsch und Griechisch. Für mehr Sprachen
+  in pdflatex die gewünschten Zeilen aus
+    TeX/texmf-dist/tex/luatex/config/language.dat     (alle Sprachen)
+  in
+    TeX/texmf-dist/tex/generic/config/language.dat    (nur pdflatex)
+  übernehmen, in TeX/texmf.cnf trie_size erhöhen (alle Sprachen:
+  1100000) und "Execute TeX:MakeFormats". (Keine language.dat in
+  texmf-local anlegen: die fände auch lualatex.)
+
+Schriften nachinstallieren
+  Zusatzarchive TeX-Fonts-*.lha an derselben Stelle auspacken wie das
+  Grundpaket, also
+    LhA x TeX-Fonts-Europe.lha Work:
+  Die Schriften landen in TeX/texmf-local. Die TeX-Shell bemerkt neue
+  Dateien beim nächsten Start selbst; in einer schon offenen TeX-Shell
+  "mktexlsr TeX:texmf-local" aufrufen.
+
+    TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
+                            Unicode): Latein, Griechisch, Kyrillisch
+    TeX-Fonts-Arabic-Hebrew Amiri, Scheherazade, Noto Naskh/Sans Arabic,
+                            Noto Sans/Serif Hebrew
+    TeX-Fonts-Asia-Africa   Noto für Devanagari, Bengali, Gujarati,
+                            Gurmukhi, Kannada, Malayalam, Oriya, Tamil,
+                            Telugu, Sinhala, Thai, Lao, Khmer, Myanmar,
+                            Tibetisch, Georgisch, Armenisch, Äthiopisch
+    TeX-Fonts-CJK           Droid Sans Fallback: Chinesisch, Japanisch,
+                            Koreanisch (eine Schrift für alle drei,
+                            ohne Fett und Kursiv)
+
+  Arabisch, Hebräisch und die indischen Schriften brauchen
+  Renderer=HarfBuzz, z. B.
+    \babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri-Regular.ttf}
+
+  Jede andere OpenType- oder TrueType-Schrift geht genauso: nach
+  TeX/texmf-local/fonts/opentype/ (oder truetype/) kopieren, mktexlsr.
+
+  Beim ersten Gebrauch einer Schrift legt lualatex einen Zwischenspeicher
+  an; das dauert bei großen Schriften (CJK) mehrere Minuten.
+
 Weitere Pakete
   In TeX/texmf-local ablegen, mit derselben Verzeichnisstruktur wie
-  texmf-dist (z. B. texmf-local/tex/latex/meinpaket/), dann in der
-  TeX-Shell "mktexlsr" aufrufen.
+  texmf-dist (z. B. texmf-local/tex/latex/meinpaket/). Die TeX-Shell
+  findet sie beim nächsten Start; sonst "mktexlsr TeX:texmf-local".
+  Pakete gibt es auf https://ctan.org.
 
 Speicher anpassen
   TeX/texmf.cnf. Nach Änderungen an main_memory, hash_extra, trie_size
@@ -102,7 +156,7 @@ Included
   mktexlsr. A texmf tree from TeX Live 2023 with LaTeX, KOMA-Script,
   TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
   hyperref, Latin Modern and the latex-extra and science collections;
-  hyphenation for German, English and Greek. Ready formats for pdflatex,
+  hyphenation for 84 languages (lualatex). Ready formats for pdflatex,
   pdftex, tex and lualatex.
 
   Not included: biber (a Perl program; use biblatex with backend=bibtex),
@@ -110,10 +164,63 @@ Included
 
   The first lualatex run builds the font list and takes a few minutes.
 
+Languages
+  lualatex handles every language TeX Live knows: hyphenation for 84
+  languages and babel descriptions for more than 380 languages are
+  included. Example:
+    \usepackage[bidi=basic]{babel}
+    \babelprovide[import, main]{english}
+    \babelprovide[import]{russian}
+    \babelfont{rm}{FreeSerif}
+  See TeX/examples/languages.tex.
+
+  All it needs is a font with the characters of the language. The base
+  package has Latin Modern (Latin script). More fonts come as add-on
+  archives (next section).
+
+  pdflatex hyphenates only English, German and Greek. For more languages
+  in pdflatex, copy the lines you want from
+    TeX/texmf-dist/tex/luatex/config/language.dat     (all languages)
+  to
+    TeX/texmf-dist/tex/generic/config/language.dat    (pdflatex only),
+  raise trie_size in TeX/texmf.cnf (all languages: 1100000) and run
+  "Execute TeX:MakeFormats". (Do not put a language.dat into
+  texmf-local: lualatex would find it too.)
+
+Adding fonts
+  Unpack the add-on archives TeX-Fonts-*.lha where you unpacked the base
+  package:
+    LhA x TeX-Fonts-Europe.lha Work:
+  The fonts go into TeX/texmf-local. The TeX-Shell notices new files the
+  next time it starts; in a TeX-Shell that is already open, run
+  "mktexlsr TeX:texmf-local".
+
+    TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
+                            Unicode): Latin, Greek, Cyrillic
+    TeX-Fonts-Arabic-Hebrew Amiri, Scheherazade, Noto Naskh/Sans Arabic,
+                            Noto Sans/Serif Hebrew
+    TeX-Fonts-Asia-Africa   Noto for Devanagari, Bengali, Gujarati,
+                            Gurmukhi, Kannada, Malayalam, Oriya, Tamil,
+                            Telugu, Sinhala, Thai, Lao, Khmer, Myanmar,
+                            Tibetan, Georgian, Armenian, Ethiopic
+    TeX-Fonts-CJK           Droid Sans Fallback: Chinese, Japanese,
+                            Korean (one font for all three, no bold or
+                            italic)
+
+  Arabic, Hebrew and the Indic scripts need Renderer=HarfBuzz, e.g.
+    \babelfont[arabic]{rm}[Renderer=HarfBuzz]{Amiri-Regular.ttf}
+
+  Any other OpenType or TrueType font works the same way: copy it to
+  TeX/texmf-local/fonts/opentype/ (or truetype/), run mktexlsr.
+
+  The first time a font is used, lualatex builds a cache for it; for big
+  fonts (CJK) that takes several minutes.
+
 More packages
   Put them into TeX/texmf-local with the same layout as texmf-dist
-  (e.g. texmf-local/tex/latex/mypackage/), then run "mktexlsr" in the
-  TeX-Shell.
+  (e.g. texmf-local/tex/latex/mypackage/). The TeX-Shell finds them the
+  next time it starts; otherwise run "mktexlsr TeX:texmf-local".
+  Packages are on https://ctan.org.
 
 Memory settings
   TeX/texmf.cnf. After changing main_memory, hash_extra, trie_size or
@@ -133,3 +240,7 @@ themselves and https://tug.org/texlive/copying.html.
 
 ixemul.library and ixnet.library 80.1 are free software, from Aminet
 (dev/gcc).
+
+The fonts in the add-on archives are free fonts (SIL Open Font License,
+GPL with font exception, Apache 2.0); their licences are in
+TeX/texmf-local/doc/fonts/.

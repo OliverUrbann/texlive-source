@@ -12,9 +12,10 @@
 #                  a list of a TeX Live installation or of the files of
 #                  Debian/Ubuntu texlive packages (dpkg -L) both work.
 #                  Documentation and sources should be left out.
-#                  Debian/Ubuntu generate language.dat, language.def,
-#                  language.dat.lua and pdftex.map below /var/lib/texmf/;
-#                  add those paths to the list too.
+#                  Debian/Ubuntu generate pdftex.map below
+#                  /var/lib/texmf/; add it to the list.
+#
+# Environment: LANG_FULL, LANG_PDF (see "Languages" below).
 #   ixemul-dir     a directory with ixemul.library and ixnet.library
 #                  (68020 versions, e.g. ixemul020/ixnet020 from ixemul 80.1)
 #   out-dir        the package is created as out-dir/TeX
@@ -64,6 +65,23 @@ print(n, "files")
 EOF
 cp "$src/texk/kpathsea/texmf.cnf" "$pkg/texmf-dist/web2c/texmf.cnf"
 
+# Languages.  language.dat in tex/generic/config is read by pdfTeX when
+# its formats are built; keep it short (English, German, Greek), so that
+# the pdfLaTeX format stays small.  LuaLaTeX looks in tex/luatex/config
+# first: give it the complete list (language.dat, language.def) and
+# language.dat.lua.  The pattern files for all of them come from
+# hyph-utf8 (a list of a full TeX Live installation contains it).
+#   LANG_FULL: directory with the complete language.dat, .def, .dat.lua
+#   LANG_PDF:  directory with the short language.dat and language.def
+if [ -n "$LANG_FULL" ]; then
+	mkdir -p "$pkg/texmf-dist/tex/luatex/config" "$pkg/texmf-dist/tex/generic/config"
+	cp "$LANG_FULL/language.dat" "$LANG_FULL/language.def" "$pkg/texmf-dist/tex/luatex/config/"
+	cp "$LANG_FULL/language.dat.lua" "$pkg/texmf-dist/tex/generic/config/"
+fi
+if [ -n "$LANG_PDF" ]; then
+	cp "$LANG_PDF/language.dat" "$LANG_PDF/language.def" "$pkg/texmf-dist/tex/generic/config/"
+fi
+
 echo "== ixemul"
 mkdir -p "$pkg/Libs"
 cp "$ixemul/ixemul.library" "$ixemul/ixnet.library" "$pkg/Libs/"
@@ -77,6 +95,9 @@ for f in TeX-Startup TeX-Assigns; do
 	iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/S/$f" >"$pkg/S/$f"
 done
 iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/ReadMe" >"$pkg/ReadMe"
+mkdir -p "$pkg/examples"
+cp "$src"/amiga/examples/*.tex "$src"/amiga/examples/*.bib "$src"/amiga/examples/*.png "$pkg/examples/"
+iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/examples/ReadMe" >"$pkg/examples/ReadMe"
 
 echo "== ls-R"
 for d in texmf-dist texmf-local; do

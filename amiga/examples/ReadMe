@@ -1,0 +1,13 @@
+Examples / Beispiele. In the TeX-Shell:
+
+  CD TeX:examples
+  pdflatex hello.tex
+  pdflatex paper.tex     then: bibtex paper, makeindex paper, pdflatex paper.tex (twice)
+  pdflatex tikz.tex
+  pdflatex thesis.tex    then: bibtex thesis, pdflatex thesis.tex (twice)
+  pdflatex slides.tex
+  lualatex unicode.tex
+  lualatex languages.tex (needs the four font add-ons TeX-Fonts-*.lha)
+
+The first lualatex run builds the font list and takes a few minutes.
+Der erste lualatex-Lauf legt die Schriftenliste an und dauert einige Minuten.
