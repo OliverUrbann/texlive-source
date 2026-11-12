@@ -31,6 +31,10 @@
 #include <netinet/tcp.h>
 #include <net/if.h>
 
+#if defined(__ixemul__)
+#include "amiga-ipv6.h"
+#endif
+
 #ifndef SO_REUSEPORT
 #define SO_REUSEPORT SO_REUSEADDR
 #endif

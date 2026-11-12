@@ -61,6 +61,9 @@ export PATH
 #                          GNU89 "extern inline".
 flags="-mcrt=ixemul -m$cpu -UAMIGA -Uamiga -include $src/amiga/ixemul-fixes.h"
 
+# ac_cv_search_nanosleep: nanosleep is in kpathsea/amiga.c, which
+# configure's link test does not see.
+#
 # Everything that is not tex/pdftex is switched off here.  To try another
 # program later, remove its --disable flag and see what breaks.
 mkdir -p "$build/cross"
@@ -74,7 +77,7 @@ if [ ! -f Makefile ]; then
 		--disable-etex --disable-ptex --disable-eptex --disable-uptex \
 		--disable-euptex --disable-aleph --disable-hitex --disable-texprof \
 		--disable-xetex --disable-mf --disable-mf-nowin --disable-mflua \
-		--disable-mfluajit --disable-luatex --disable-luajittex \
+		--disable-mfluajit --enable-luatex --disable-luajittex \
 		--disable-luahbtex --disable-luajithbtex --disable-mp --disable-pmp \
 		--disable-upmp \
 		--disable-mktexfmt-default --disable-mktexmf-default \
@@ -83,6 +86,7 @@ if [ ! -f Makefile ]; then
 		--without-x --disable-shared --enable-static --disable-largefile \
 		CC="m68k-amigaos-gcc $flags" CXX="m68k-amigaos-g++ $flags" \
 		CFLAGS="-O2 -std=gnu17 -fgnu89-inline" CXXFLAGS="-O2" \
+		ac_cv_search_nanosleep="none required" \
 		>configure.log 2>&1 || { echo "configure failed, see $build/cross/configure.log" >&2; exit 1; }
 fi
 

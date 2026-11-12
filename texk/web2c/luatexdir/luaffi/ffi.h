@@ -38,8 +38,30 @@ extern "C" {
 #else
 #include <errno.h>
 #include <unistd.h>
+/* AmigaOS 3 with ixemul.library: no shared objects, no mmap; ffi is
+   only a stub on m68k anyway (see FFI_ENABLE_LUATEX_INTERFACE).  */
+#if !defined(__ixemul__)
 #include <dlfcn.h>
 #include <sys/mman.h>
+#else
+/* Stand-ins that always fail, so that the files compile; none of this
+   code runs, luaopen_ffi is the stub.  */
+#define RTLD_LAZY 1
+#define RTLD_GLOBAL 2
+#define PROT_READ 1
+#define PROT_WRITE 2
+#define PROT_EXEC 4
+#define MAP_PRIVATE 2
+#define MAP_ANON 0x1000
+#define _SC_PAGE_SIZE 0
+static inline void *dlopen (const char *n, int f) { (void) n; (void) f; return 0; }
+static inline void *dlsym (void *h, const char *n) { (void) h; (void) n; return 0; }
+static inline int dlclose (void *h) { (void) h; return 0; }
+static inline void *mmap (void *a, size_t l, int p, int f, int fd, long o)
+{ (void) a; (void) l; (void) p; (void) f; (void) fd; (void) o; return (void *) -1; }
+static inline int munmap (void *a, size_t l) { (void) a; (void) l; return -1; }
+static inline int mprotect (void *a, size_t l, int p) { (void) a; (void) l; (void) p; return -1; }
+#endif
 #endif
 
 #if __STDC_VERSION__+0 >= 199901L

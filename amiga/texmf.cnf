@@ -25,3 +25,9 @@ trie_size = 400000        % enough for a few languages; all of
                           % language.dat needs about 1100000
 save_size = 100000
 stack_size = 5000
+
+% One user, no home directory: keep the per-user trees inside the TeX
+% tree instead of ~/.texliveYYYY.
+TEXMFHOME = $TEXMFLOCAL
+TEXMFVAR = $TEXMFSYSVAR
+TEXMFCONFIG = $TEXMFSYSCONFIG

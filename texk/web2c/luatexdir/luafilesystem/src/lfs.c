@@ -269,6 +269,13 @@ static int _file_lock (lua_State *L, FILE *fh, const char *mode, const long star
 #else
         code = _locking (fileno(fh), lkmode, len);
 #endif
+#elif defined(__ixemul__)
+        /* AmigaOS 3 with ixemul.library: no fcntl record locks.  Accept
+           the request without locking; there is one user.  */
+        (void) fh; (void) start; (void) len;
+        if (*mode != 'w' && *mode != 'r' && *mode != 'u')
+                return luaL_error (L, "%s: invalid mode", funcname);
+        code = 0;
 #else
         struct flock f;
         switch (*mode) {

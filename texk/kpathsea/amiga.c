@@ -25,6 +25,10 @@
 #include <math.h>
 #include <complex.h>
 #include <signal.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 /* The NDK's devices/timer.h defines struct timeval again; ixemul's
    <sys/time.h> already did.  Rename the NDK one, we do not use it.  */
@@ -114,10 +118,95 @@ kpathsea_amiga_unix_path (const char *name)
   return ret;
 }
 
+/* ---- localtime_r, gmtime_r ------------------------------------------ */
+
+struct tm *
+tl_amiga_localtime_r (const void *t, struct tm *r)
+{
+  struct tm *p = localtime ((const time_t *) t);
+  if (!p)
+    return NULL;
+  *r = *p;
+  return r;
+}
+
+struct tm *
+tl_amiga_gmtime_r (const void *t, struct tm *r)
+{
+  struct tm *p = gmtime ((const time_t *) t);
+  if (!p)
+    return NULL;
+  *r = *p;
+  return r;
+}
+
+/* ---- nanosleep ------------------------------------------------------ */
+
+int
+nanosleep (const struct timespec *req, struct timespec *rem)
+{
+  if (req->tv_sec > 0)
+    sleep (req->tv_sec);
+  if (req->tv_nsec >= 1000)
+    usleep (req->tv_nsec / 1000);
+  if (rem) {
+    rem->tv_sec = 0;
+    rem->tv_nsec = 0;
+  }
+  return 0;
+}
+
+/* ---- getaddrinfo and friends ----------------------------------------
+
+   ixemul.library declares them in <netdb.h> but does not have them.
+   Only LuaTeX's socket library (off unless --socket is given) uses
+   them.  These always fail: no network name lookup in LuaTeX on
+   AmigaOS 3 until someone writes one on top of gethostbyname.  */
+
+int
+getaddrinfo (const char *node, const char *service,
+             const struct addrinfo *hints, struct addrinfo **res)
+{
+  (void) node; (void) service; (void) hints;
+  if (res)
+    *res = NULL;
+  return EAI_FAIL;
+}
+
+void
+freeaddrinfo (struct addrinfo *res)
+{
+  (void) res;
+}
+
+int
+getnameinfo (const struct sockaddr *sa, socklen_t salen, char *host,
+             socklen_t hostlen, char *serv, socklen_t servlen, int flags)
+{
+  (void) sa; (void) salen; (void) host; (void) hostlen;
+  (void) serv; (void) servlen; (void) flags;
+  return EAI_FAIL;
+}
+
+char *
+gai_strerror (int code)
+{
+  (void) code;
+  return (char *) "name lookup is not available on AmigaOS 3";
+}
+
 /* ---- Math ------------------------------------------------------------
 
    ixemul's libm.a is empty; the math lives in libc.a/ixemul.library and
    stops at C89.  xpdf (pdfTeX) needs these.  */
+
+#undef round
+#undef trunc
+#undef log2
+#undef lround
+#undef llround
+#undef fmin
+#undef fmax
 
 double
 trunc (double x)
@@ -139,6 +228,75 @@ atan2 (double y, double x)
   if (y < 0.0)
     return -M_PI_2;
   return 0.0;
+}
+
+double
+round (double x)
+{
+  return x < 0.0 ? ceil (x - 0.5) : floor (x + 0.5);
+}
+
+long
+lround (double x)
+{
+  return (long) round (x);
+}
+
+long long
+llround (double x)
+{
+  return (long long) round (x);
+}
+
+double
+fmin (double x, double y)
+{
+  return x < y ? x : y;
+}
+
+double
+fmax (double x, double y)
+{
+  return x > y ? x : y;
+}
+
+double
+rint (double x)
+{
+  /* round half to even, as the default rounding mode does */
+  double r = floor (x + 0.5);
+  if (r - x == 0.5 && fmod (r, 2.0) != 0.0)
+    r -= 1.0;
+  return r;
+}
+
+#undef floorf
+float
+floorf (float x)
+{
+  return (float) floor (x);
+}
+
+double
+fmod (double x, double y)
+{
+  double q;
+  if (y == 0.0)
+    return x;
+  modf (x / y, &q);
+  return x - q * y;
+}
+
+double
+log2 (double x)
+{
+  return log (x) / M_LN2;
+}
+
+double
+hypot (double x, double y)
+{
+  return sqrt (x * x + y * y);
 }
 
 double complex
