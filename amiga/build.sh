@@ -9,7 +9,7 @@
 # native 32-bit compiler for LuaJIT, even though LuaJIT is not built:
 # install gcc-multilib (Debian/Ubuntu).
 #
-# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,bibtex,makeindex,
+# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,luatex,bibtex,makeindex,
 #                                              kpsewhich,mktexlsr}
 #         <build-dir>/dist/TeX/texmf.cnf, <build-dir>/dist/TeX/texmf-dist/web2c/texmf.cnf
 # See amiga/README.amiga.md for what to add to make it a working TeX.
@@ -93,10 +93,12 @@ fi
 # ---- 3. build ----------------------------------------------------------
 # Not the plain top-level "make": it would also configure utils/, whose
 # configure scripts fail for this host although nothing there is enabled.
-# "make recurse" at the top configures and builds kpathsea.
+# "make recurse" at the top configures kpathsea (and builds it the first
+# time only, hence the explicit make after it).
 echo "== build"
 {
 	make recurse -j"$jobs" &&
+	make -C texk/kpathsea -j"$jobs" &&
 	make -C libs -j"$jobs" &&
 	make -C texk -j"$jobs"
 } >make.log 2>&1 || { echo "build failed, see $build/cross/make.log" >&2; exit 1; }
@@ -111,7 +113,7 @@ m68k-amigaos-gcc $flags -O2 -std=gnu17 -fgnu89-inline -DHAVE_CONFIG_H \
 # ---- 4. collect --------------------------------------------------------
 dist=$build/dist/TeX
 mkdir -p "$dist/bin/m68k-amigaos" "$dist/texmf-dist/web2c"
-for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/bibtex \
+for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/luatex texk/web2c/bibtex \
 	texk/makeindexk/makeindex texk/kpathsea/kpsewhich mktexlsr; do
 	m68k-amigaos-strip -o "$dist/bin/m68k-amigaos/$(basename $p)" $p
 done

@@ -27,3 +27,14 @@ Echo "== tex.fmt"
 tex -ini -interaction=batchmode tex.ini
 CD ///
 mktexlsr
+; LuaLaTeX: Unicode input and OpenType/TrueType fonts.  Building this
+; format needs about 100 MB of free memory; skip it with Ctrl-C or
+; remove these lines on smaller machines.
+If NOT EXISTS texmf-var/web2c/luatex
+  MakeDir texmf-var/web2c/luatex
+EndIf
+CD texmf-var/web2c/luatex
+Echo "== lualatex.fmt"
+luatex -ini -interaction=batchmode -jobname=lualatex lualatex.ini
+CD ///
+mktexlsr

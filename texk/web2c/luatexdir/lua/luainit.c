@@ -517,6 +517,18 @@ static void parse_options(int ac, char **av)
             uexit(0);
         }
     }
+#if defined(__ixemul__)
+    /*tex
+        AmigaOS 3 with ixemul: accept |Work:doc/paper.tex| and turn it into
+        ixemul's Unix form |/Work/doc/paper.tex|, as pdf\TeX\ does (see
+        |lib/texmfmp.c|).
+    */
+    if (argv[optind]) {
+        char *unix_name = kpathsea_amiga_unix_path(argv[optind]);
+        if (unix_name)
+            argv[optind] = unix_name;
+    }
+#endif
     /*tex attempt to find |input_name| and |dump_name| */
     if (lua_only) {
         if (argv[optind]) {

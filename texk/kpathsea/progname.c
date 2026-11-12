@@ -680,6 +680,13 @@ kpathsea_set_program_name (kpathsea kpse,  const_string argv0,
      since `prog' doesn't exists as a file, there's `prog.exe' instead.  */
 #ifndef WIN32
   sdir = kpathsea_selfdir (kpse, kpse->invocation_name);
+#if defined (__ixemul__)
+  /* The Amiga Shell has a command path but no PATH variable.  Unix code
+     takes PATH for granted (the Lua libraries that LuaLaTeX loads call
+     string functions on it), so provide one: the program's directory.  */
+  if (!getenv ("PATH"))
+    kpathsea_xputenv (kpse, "PATH", sdir);
+#endif
 #endif
   /* SELFAUTODIR is actually the parent of the invocation directory,
      and SELFAUTOPARENT the grandparent.  This is how teTeX did it.  */
