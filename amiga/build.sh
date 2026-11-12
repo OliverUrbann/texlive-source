@@ -9,7 +9,8 @@
 # native 32-bit compiler for LuaJIT, even though LuaJIT is not built:
 # install gcc-multilib (Debian/Ubuntu).
 #
-# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,luatex,bibtex,makeindex,
+# Result: <build-dir>/dist/TeX/bin/m68k-amigaos/{tex,pdftex,luatex,luahbtex,bibtex,
+#                                              makeindex,
 #                                              kpsewhich,mktexlsr}
 #         <build-dir>/dist/TeX/texmf.cnf, <build-dir>/dist/TeX/texmf-dist/web2c/texmf.cnf
 # See amiga/README.amiga.md for what to add to make it a working TeX.
@@ -61,8 +62,40 @@ export PATH
 #                          GNU89 "extern inline".
 flags="-mcrt=ixemul -m$cpu -UAMIGA -Uamiga -include $src/amiga/ixemul-fixes.h"
 
+# C++.  The toolchain's libstdc++ was configured for newlib, not for
+# ixemul's much older C library, and its headers reach the C headers with
+# #include_next, which skips the ixemul directory (it comes first) and
+# lands in newlib's.  So the C++ compiler gets its own search path:
+#   amiga/cxx          wchar.h, wctype.h stand-ins
+#   cxx-compat         generated here: libstdc++'s c++config.h with the
+#                      features switched off that ixemul's libc lacks
+#                      (wide characters, C99 math/stdio/stdlib names),
+#                      and a copy of ixemul's headers, which must come
+#                      after the C++ directories as well
+#   libstdc++, gcc and NDK directories as usual
+# Only headers and templates are affected; libstdc++.a itself is used as
+# it is, and kpathsea/amiga.c supplies the few newlib symbols it needs.
+gccinc=$(m68k-amigaos-gcc -print-file-name=include)
+multi=$(m68k-amigaos-gcc -m$cpu -print-multi-directory)
+prefix=$(dirname "$(dirname "$(command -v m68k-amigaos-gcc)")")
+ixinc=$prefix/m68k-amigaos/ixemul/include
+compat=$build/cxx-compat
+if [ ! -f "$compat/bits/c++config.h" ]; then
+	mkdir -p "$compat/bits" "$compat/ixemul"
+	cp -r "$ixinc/." "$compat/ixemul/"
+	sed -E 's/^#define (_GLIBCXX(98|11)_USE_C99_(COMPLEX|MATH|STDIO|STDLIB|WCHAR)|_GLIBCXX_USE_C99_(COMPLEX_ARC|COMPLEX_TR1|FENV|FENV_TR1|MATH_FUNCS|MATH_TR1|INTTYPES_WCHAR_T|INTTYPES_WCHAR_T_TR1)|_GLIBCXX_USE_WCHAR_T|_GLIBCXX_HAVE_AT_QUICK_EXIT|_GLIBCXX_HAVE_QUICK_EXIT|_GLIBCXX_HAVE_STRTOLD|_GLIBCXX_HAVE_STRTOF|_GLIBCXX_HAVE_FENV_H|_GLIBCXX_HAVE_WCTYPE_H|_GLIBCXX_HAVE_[A-Z0-9]+[FL]) 1$/\/* off for ixemul: \1 *\//' \
+		"$gccinc/c++/$(m68k-amigaos-gcc -dumpmachine)/$multi/bits/c++config.h" \
+		>"$compat/bits/c++config.h"
+fi
+cxxflags="$flags -nostdinc -isystem $src/amiga/cxx -isystem $compat \
+-isystem $gccinc/c++ -isystem $gccinc/c++/$(m68k-amigaos-gcc -dumpmachine)/$multi \
+-isystem $gccinc/c++/backward -isystem $compat/ixemul -isystem $gccinc \
+-isystem $prefix/m68k-amigaos/ndk-include -include $src/amiga/cxx/tl-amiga-cxx.h"
+
 # ac_cv_search_nanosleep: nanosleep is in kpathsea/amiga.c, which
 # configure's link test does not see.
+# ac_cv_func_mmap=no, ac_cv_func_mprotect=no: ixemul has a <sys/mman.h>
+# but no usable mmap or mprotect.
 #
 # Everything that is not tex/pdftex is switched off here.  To try another
 # program later, remove its --disable flag and see what breaks.
@@ -78,15 +111,16 @@ if [ ! -f Makefile ]; then
 		--disable-euptex --disable-aleph --disable-hitex --disable-texprof \
 		--disable-xetex --disable-mf --disable-mf-nowin --disable-mflua \
 		--disable-mfluajit --enable-luatex --disable-luajittex \
-		--disable-luahbtex --disable-luajithbtex --disable-mp --disable-pmp \
+		--enable-luahbtex --disable-luajithbtex --disable-mp --disable-pmp \
 		--disable-upmp \
 		--disable-mktexfmt-default --disable-mktexmf-default \
 		--disable-mktexpk-default --disable-mktextfm-default \
 		--disable-synctex --disable-tex-synctex --disable-pdftex-synctex \
 		--without-x --disable-shared --enable-static --disable-largefile \
-		CC="m68k-amigaos-gcc $flags" CXX="m68k-amigaos-g++ $flags" \
+		CC="m68k-amigaos-gcc $flags" CXX="m68k-amigaos-g++ $cxxflags" \
 		CFLAGS="-O2 -std=gnu17 -fgnu89-inline" CXXFLAGS="-O2" \
-		ac_cv_search_nanosleep="none required" \
+		ac_cv_search_nanosleep="none required" ac_cv_func_mmap=no \
+		ac_cv_func_mprotect=no \
 		>configure.log 2>&1 || { echo "configure failed, see $build/cross/configure.log" >&2; exit 1; }
 fi
 
@@ -95,11 +129,17 @@ fi
 # configure scripts fail for this host although nothing there is enabled.
 # "make recurse" at the top configures kpathsea (and builds it the first
 # time only, hence the explicit make after it).
+# TeX Live lists ICU as a dependency of HarfBuzz (for XeTeX); HarfBuzz
+# itself is built without it.  ICU is not ported, so leave it out.
+libs_without_icu () {
+	sed -n 's/^MAKE_SUBDIRS = //p' libs/Makefile | tr ' ' '\n' |
+		grep -v '^icu$' | tr '\n' ' '
+}
 echo "== build"
 {
 	make recurse -j"$jobs" &&
 	make -C texk/kpathsea -j"$jobs" &&
-	make -C libs -j"$jobs" &&
+	make -C libs -j"$jobs" MAKE_SUBDIRS="$(libs_without_icu)" &&
 	make -C texk -j"$jobs"
 } >make.log 2>&1 || { echo "build failed, see $build/cross/make.log" >&2; exit 1; }
 
@@ -113,7 +153,8 @@ m68k-amigaos-gcc $flags -O2 -std=gnu17 -fgnu89-inline -DHAVE_CONFIG_H \
 # ---- 4. collect --------------------------------------------------------
 dist=$build/dist/TeX
 mkdir -p "$dist/bin/m68k-amigaos" "$dist/texmf-dist/web2c"
-for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/luatex texk/web2c/bibtex \
+for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/luatex texk/web2c/luahbtex \
+	texk/web2c/bibtex \
 	texk/makeindexk/makeindex texk/kpathsea/kpsewhich mktexlsr; do
 	m68k-amigaos-strip -o "$dist/bin/m68k-amigaos/$(basename $p)" $p
 done

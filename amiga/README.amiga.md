@@ -9,20 +9,24 @@ code is laid out so they can be added (see "Other Amiga systems").
 | Program | What it is for |
 |---|---|
 | `pdftex`, `pdflatex` | LaTeX to PDF, the usual 8-bit engine |
-| `luatex`, `lualatex` | Unicode input, OpenType/TrueType fonts, Lua |
+| `luahbtex`, `lualatex` | Unicode input, OpenType/TrueType fonts, Lua; HarfBuzz shaping on request (`Renderer=HarfBuzz`), e.g. for Arabic |
+| `luatex` | LuaTeX without HarfBuzz |
 | `tex` | Knuth's TeX, DVI output |
 | `bibtex` | bibliographies |
 | `makeindex` | indexes and glossaries |
 | `kpsewhich` | finds files the way TeX does |
 | `mktexlsr` | writes the `ls-R` file name databases (new, in C; the original is a shell script) |
 
-`pdflatex` and `lualatex` are the same files as `pdftex` and `luatex`
-under another name; the `Install` script creates them.
+`pdflatex` and `lualatex` are the same files as `pdftex` and `luahbtex`
+under another name, as in TeX Live; the `Install` script creates them.
 
 ## Status
 
 Tested in FS-UAE (A1200, 68030/68882, Kickstart 3.1, ixemul 80.1), with
 64 MB for pdfTeX and 128 MB for LuaTeX. Not yet tested on real hardware.
+The final test run was made without the emulator's JIT compiler: with JIT,
+FS-UAE now and then loses the FPU control register, and programs then
+print wrong numbers or hang. That is the emulator, not the port.
 Each result was compared with the output of TeX Live on Linux for the
 same input (text, page count, fonts, rendered pages).
 
@@ -34,8 +38,12 @@ same input (text, page count, fonts, rendered pages).
 | KOMA-Script report with biblatex (`backend=bibtex`), csquotes | same |
 | beamer slides | same |
 | PNG, JPEG and PDF images | same |
-| 139-page book: 150 references, 25 plots, tables, longtable, index | same; a few pixels differ on some pages, cause not found (the Linux pdfTeX is an older version) |
+| 139-page book: 150 references, 25 plots, tables, longtable, index | same; a few pixels differ on some pages, cause not found (the Linux pdfTeX is an older version). Tested with JIT only, before the last changes |
 | LuaLaTeX with fontspec: Latin Modern OpenType; DejaVu Serif TrueType with Greek and Cyrillic | same |
+| LuaLaTeX with `Renderer=HarfBuzz`: Latin Modern; DejaVu Sans with Arabic, right to left | same |
+| the math functions added for ixemul (`amiga/tests/mathtest.c`) | same values, except the sign of zero, the last digit of two float results, and `pow(0, negative)`, which is ixemul's own |
+
+In the article test 23 pixels differ on page 2; cause not found.
 
 Not tested: JBIG2 images, `\write18`/shell escape, network access from
 Lua, MetaPost inside LuaTeX, and the small web2c tools (`dvicopy`,
@@ -49,11 +57,10 @@ removed from the source:
 
 - `biber`: a Perl program. Use biblatex with `backend=bibtex`.
 - `bibtex8`, `bibtexu`: tied to the ICU library in TeX Live's build.
-- `xetex`: needs ICU, HarfBuzz and Fontconfig. `lualatex` covers the same
-  ground.
-- `luahbtex` (HarfBuzz shaping, needed for Arabic, Indic scripts etc.) and
-  LuaJIT: not tried yet. TeX Live's own `lualatex` is `luahbtex`; here it
-  is `luatex`, where luaotfload does the shaping in Lua.
+- `xetex`: needs ICU and Fontconfig. `lualatex` covers the same ground.
+  ICU is the obstacle: it needs C++ threads, which the toolchain does not
+  have (thread model "single").
+- LuaJIT (`luajittex`): no m68k back end.
 - Metafont, MetaPost, dvips, dvipdfmx, pTeX/upTeX and the remaining
   programs: not tried yet.
 - `mktexfmt`, `mktexpk`, `mktextfm` (automatic generation): shell scripts.
@@ -155,8 +162,13 @@ Everything is inside `#if defined (__ixemul__)`.
   m68k as on other unsupported processors.
 - `luatexdir/luafilesystem/src/lfs.c`: `lfs.lock` succeeds without
   locking.
+- `amiga/cxx/` (new) and a generated `cxx-compat` directory: what the C++
+  compiler needs to use libstdc++'s headers over ixemul's C library
+  (HarfBuzz and Graphite are C++). `amiga/build.sh` explains it.
+- ICU is left out of the build although TeX Live lists it as a dependency
+  of HarfBuzz; HarfBuzz does not use it.
 - `amiga/mktexlsr.c`, `amiga/Install`, `amiga/MakeFormats`,
-  `amiga/texmf.cnf`, `amiga/build.sh` (new).
+  `amiga/texmf.cnf`, `amiga/build.sh`, `amiga/tests/mathtest.c` (new).
 
 kpathsea's old `#ifdef AMIGA` code (SAS/C, native Amiga paths) is still
 there but not used: the build passes `-UAMIGA`.
@@ -168,7 +180,7 @@ there but not used: the build passes `-UAMIGA`.
 today). For a new system:
 
 - add its section to `amiga.h`/`amiga.c`; most of the ixemul work-arounds
-  (math, newlib symbols, `va_arg`, IPv6) should not be needed with a
+  (math, newlib symbols, `va_arg`, IPv6, the C++ layer) should not be needed with a
   current C library, the program directory and path conversion probably
   are;
 - copy `amiga/build.sh` and change the compiler and flags;

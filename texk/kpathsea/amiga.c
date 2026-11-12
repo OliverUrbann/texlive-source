@@ -239,13 +239,15 @@ round (double x)
 long
 lround (double x)
 {
-  return (long) round (x);
+  volatile double r = round (x);   /* see AMIGA_F1 about volatile */
+  return (long) r;
 }
 
 long long
 llround (double x)
 {
-  return (long long) round (x);
+  volatile double r = round (x);
+  return (long long) r;
 }
 
 double
@@ -270,12 +272,42 @@ rint (double x)
   return r;
 }
 
+/* The float variants as real functions too: gcc may emit calls to them
+   (from __builtin_ceilf and the like) whatever the headers say.  */
+#undef sinf
+#undef cosf
+#undef tanf
+#undef asinf
+#undef acosf
+#undef atanf
+#undef expf
+#undef logf
+#undef log10f
+#undef sqrtf
+#undef fabsf
 #undef floorf
-float
-floorf (float x)
-{
-  return (float) floor (x);
-}
+#undef ceilf
+#undef roundf
+#undef truncf
+#undef powf
+#undef atan2f
+#undef fmodf
+/* The volatile temporaries matter: gcc turns "(float) floor ((double) x)"
+   back into a call of floorf, which would be this very function.  */
+#define AMIGA_F1(n) float n##f (float x) \
+  { volatile double d = x; d = n (d); return (float) d; }
+#define AMIGA_F2(n) float n##f (float x, float y) \
+  { volatile double d = x, e = y; d = n (d, e); return (float) d; }
+double round (double);
+double trunc (double);
+double fmod (double, double);
+double atan2 (double, double);
+double hypot (double, double);
+AMIGA_F1 (sin) AMIGA_F1 (cos) AMIGA_F1 (tan) AMIGA_F1 (asin) AMIGA_F1 (acos)
+AMIGA_F1 (atan) AMIGA_F1 (exp) AMIGA_F1 (log) AMIGA_F1 (log10) AMIGA_F1 (sqrt)
+AMIGA_F1 (fabs) AMIGA_F1 (floor) AMIGA_F1 (ceil) AMIGA_F1 (round)
+AMIGA_F1 (trunc)
+AMIGA_F2 (pow) AMIGA_F2 (atan2) AMIGA_F2 (fmod) AMIGA_F2 (hypot)
 
 double
 fmod (double x, double y)
@@ -302,9 +334,13 @@ hypot (double x, double y)
 double complex
 cexp (double complex z)
 {
+  /* gcc itself calls cexp when it sees sin and cos of one argument, so
+     this function must not look like that: two volatile copies.  */
+  volatile double ic = cimag (z), is = cimag (z);
   double r = exp (creal (z));
-  double i = cimag (z);
-  return __builtin_complex (r * cos (i), r * sin (i));
+  double c = cos (ic);
+  double s = sin (is);
+  return __builtin_complex (r * c, r * s);
 }
 
 /* ---- newlib symbols for libstdc++ -------------------------------------

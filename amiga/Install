@@ -1,5 +1,5 @@
 ; Install: run once from the root of the TeX tree:   Execute Install
-; Creates the commands "pdflatex" and "lualatex" (pdftex and luatex under
+; Creates the commands "pdflatex" and "lualatex" (pdftex and luahbtex under
 ; another name: the programs pick their format by the name they are
 ; called with) and the file name
 ; databases.  Then run:  Execute MakeFormats
@@ -13,9 +13,9 @@ If NOT EXISTS pdflatex
   EndIf
 EndIf
 If NOT EXISTS lualatex
-  MakeLink lualatex luatex HARD
+  MakeLink lualatex luahbtex HARD
   If NOT EXISTS lualatex
-    Copy luatex lualatex
+    Copy luahbtex lualatex
   EndIf
 EndIf
 CD //
