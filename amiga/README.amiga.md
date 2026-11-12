@@ -4,6 +4,11 @@ A port of parts of TeX Live to classic AmigaOS 3.x: 68020 or better,
 `ixemul.library`. AmigaOS 4 and MorphOS are planned but not started; the
 code is laid out so they can be added (see "Other Amiga systems").
 
+A ready package (programs, texmf tree, formats) is on the
+[releases page](https://github.com/OliverUrbann/texlive-source/releases):
+unpack it anywhere and double-click `TeX-Shell`. Its `ReadMe` (German and
+English) explains the use; this file is about the port itself.
+
 ## Programs
 
 | Program | What it is for |
@@ -18,7 +23,7 @@ code is laid out so they can be added (see "Other Amiga systems").
 | `mktexlsr` | writes the `ls-R` file name databases (new, in C; the original is a shell script) |
 
 `pdflatex` and `lualatex` are the same files as `pdftex` and `luahbtex`
-under another name, as in TeX Live; the `Install` script creates them.
+under another name, as in TeX Live.
 
 ## Status
 
@@ -78,37 +83,35 @@ On Linux, with the m68k-amigaos toolchain from
 The result is in `build-dir/dist/TeX`. The script explains each compiler
 flag.
 
-## Installing
+## Making the package
 
-Copy `dist/TeX` to the Amiga and add the texmf tree, so that it looks like
-this:
+`amiga/mkpackage.sh` puts the drawer together: the programs from
+`build.sh`, a texmf tree taken from a list of files (a TeX Live
+installation or the files of Debian/Ubuntu texlive packages), ixemul,
+`TeX-Shell` with its icon (drawn by `amiga/mkicon.py`) and the `ReadMe`.
+The released package used the files of these Ubuntu packages of TeX Live
+2023, without documentation and sources: texlive-base, -latex-base,
+-latex-recommended, -latex-extra, -pictures, -fonts-recommended,
+-lang-german, -lang-greek, -luatex, -bibtex-extra, -science, lmodern,
+fonts-lmodern.
 
+The formats must be built by the Amiga programs: `Execute MakeFormats` in
+the drawer, on an Amiga or in an emulator. Then pack the drawer with LhA.
+
+    TeX/TeX-Shell(.info)             opens a Shell set up for TeX
+    TeX/S/TeX-Startup, TeX-Assigns   what the TeX-Shell runs
+    TeX/MakeFormats                  rebuilds the formats
     TeX/bin/m68k-amigaos/...
-    TeX/texmf.cnf                     (from amiga/texmf.cnf)
-    TeX/Install, TeX/MakeFormats
-    TeX/texmf-dist/web2c/texmf.cnf    (TeX Live's own)
-    TeX/texmf-dist/...                (from a TeX Live installation)
+    TeX/Libs/ixemul.library, ixnet.library
+    TeX/texmf.cnf                    from amiga/texmf.cnf
+    TeX/texmf-dist/...               TeX Live's tree, web2c/texmf.cnf from kpathsea
+    TeX/texmf-local/                 for the user's own packages
+    TeX/texmf-var/                   formats, LuaTeX's font cache
 
 The programs find the tree from their own location, so it can be anywhere.
-`texmf-dist` is not part of this repository; take it from a TeX Live
-installation. The tests used the tree of TeX Live 2023.
-
-ixemul needs `Assign AmiTCP:` to exist, otherwise each program asks for
-the volume.
-
-Then, in a Shell:
-
-    CD Work:TeX
-    Execute Install        ; pdflatex, lualatex, ls-R
-    Execute MakeFormats    ; the formats, in texmf-var/web2c/
-    Path Work:TeX/bin/m68k-amigaos ADD
-
-and
-
-    pdflatex paper.tex
-    bibtex paper
-    makeindex paper
-    lualatex Work:doc/unicode.tex
+Nothing is copied into the system: the TeX-Shell (`S/TeX-Assigns`) adds
+`TeX:Libs` to `LIBS:`, assigns `AmiTCP:` if no TCP stack did (ixemul asks
+for that volume otherwise) and adds the programs to the Shell's path.
 
 File names can be given in Amiga form (`Work:doc/a.tex`) or in ixemul's
 Unix form (`/Work/doc/a.tex`). Search paths in `texmf.cnf` and in
@@ -167,7 +170,8 @@ Everything is inside `#if defined (__ixemul__)`.
   (HarfBuzz and Graphite are C++). `amiga/build.sh` explains it.
 - ICU is left out of the build although TeX Live lists it as a dependency
   of HarfBuzz; HarfBuzz does not use it.
-- `amiga/mktexlsr.c`, `amiga/Install`, `amiga/MakeFormats`,
+- `amiga/mktexlsr.c`, `amiga/MakeFormats`, `amiga/TeX-Shell`, `amiga/S/`,
+  `amiga/mkpackage.sh`, `amiga/mkicon.py`, `amiga/ReadMe`,
   `amiga/texmf.cnf`, `amiga/build.sh`, `amiga/tests/mathtest.c` (new).
 
 kpathsea's old `#ifdef AMIGA` code (SAS/C, native Amiga paths) is still

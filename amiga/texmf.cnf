@@ -28,6 +28,7 @@ stack_size = 5000
 
 % One user, no home directory: keep the per-user trees inside the TeX
 % tree instead of ~/.texliveYYYY.
+TEXMFLOCAL = $SELFAUTOPARENT/texmf-local
 TEXMFHOME = $TEXMFLOCAL
 TEXMFVAR = $TEXMFSYSVAR
 TEXMFCONFIG = $TEXMFSYSCONFIG

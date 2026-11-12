@@ -1,0 +1,8 @@
+; TeX-Startup: start-up file of the TeX-Shell (NewShell ... FROM this).
+; The usual Shell start-up first, then the TeX settings.
+If EXISTS S:Shell-Startup
+  Execute S:Shell-Startup
+EndIf
+Execute TeX:S/TeX-Assigns
+Echo "TeX Live for AmigaOS 3:  pdflatex  lualatex  bibtex  makeindex  tex"
+Echo "Documents can be anywhere; CD there first.  Help: TeX:ReadMe"

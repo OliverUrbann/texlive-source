@@ -1,0 +1,135 @@
+TeX Live für AmigaOS 3 / TeX Live for AmigaOS 3
+================================================
+
+DEUTSCH
+
+Installation
+  Das Archiv irgendwo auspacken, wo etwa 520 MB frei sind:
+    LhA x TeXLive-Amiga.lha Work:
+  Es entsteht das Verzeichnis "TeX". Mehr ist nicht zu tun: es wird nichts
+  ins System kopiert, Formate und Dateidatenbanken liegen fertig bei.
+
+Benutzen
+  "TeX-Shell" im Verzeichnis TeX doppelt anklicken. Es öffnet sich eine
+  Shell, in der die TeX-Programme bereitstehen:
+    CD Work:Dokumente
+    pdflatex arbeit.tex
+    bibtex arbeit
+    makeindex arbeit
+    lualatex unicode.tex
+  Dateinamen gehen in beiden Formen: Work:Dokumente/arbeit.tex oder
+  /Work/Dokumente/arbeit.tex.
+
+TeX in jeder Shell
+  Diese zwei Zeilen in S:User-Startup eintragen (Pfad anpassen):
+    Assign TeX: Work:TeX
+    Execute TeX:S/TeX-Assigns
+
+Voraussetzungen
+  68020 oder besser, AmigaOS 3.x. Speicher: pdfLaTeX etwa 40 MB, LuaLaTeX
+  etwa 128 MB. Mitgeliefert wird ixemul.library 80.1 (in TeX/Libs, wird
+  von der TeX-Shell gefunden). Liegt in LIBS: eine ältere ixemul.library,
+  meldet die TeX-Shell das; dann TeX/Libs/ixemul.library und
+  ixnet.library nach LIBS: kopieren.
+
+  Getestet im Emulator (FS-UAE, Kickstart 3.1, 68030), noch nicht auf
+  echter Hardware.
+
+Enthalten
+  pdfTeX, LuaTeX (mit HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
+  mktexlsr. Ein texmf-Baum aus TeX Live 2023 mit LaTeX, KOMA-Script,
+  TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
+  hyperref, Latin Modern und den Sammlungen latex-extra und science;
+  Silbentrennung für Deutsch, Englisch und Griechisch. Fertige Formate für
+  pdflatex, pdftex, tex und lualatex.
+
+  Nicht enthalten: biber (ein Perl-Programm; biblatex mit backend=bibtex
+  verwenden), XeTeX, Metafont, MetaPost, dvips.
+
+  Der erste Lauf von lualatex legt die Schriftenliste an und dauert
+  einige Minuten.
+
+Weitere Pakete
+  In TeX/texmf-local ablegen, mit derselben Verzeichnisstruktur wie
+  texmf-dist (z. B. texmf-local/tex/latex/meinpaket/), dann in der
+  TeX-Shell "mktexlsr" aufrufen.
+
+Speicher anpassen
+  TeX/texmf.cnf. Nach Änderungen an main_memory, hash_extra, trie_size
+  oder hyph_size die Formate neu erzeugen: in der TeX-Shell
+    Execute TeX:MakeFormats
+  (auf einem 68030 etwa eine Stunde, auf einer Vampire wenige Minuten).
+
+Mehr: TeX/README.amiga.md. Quelltext und Build-Skripte:
+  https://github.com/OliverUrbann/texlive-source (Branch "amiga")
+
+
+ENGLISH
+
+Installation
+  Unpack the archive anywhere with about 520 MB free:
+    LhA x TeXLive-Amiga.lha Work:
+  This creates the drawer "TeX". That is all: nothing is copied into the
+  system, formats and file name databases are included.
+
+Use
+  Double-click "TeX-Shell" in the TeX drawer. It opens a Shell with the
+  TeX programs ready:
+    CD Work:Documents
+    pdflatex thesis.tex
+    bibtex thesis
+    makeindex thesis
+    lualatex unicode.tex
+  File names work in both forms: Work:Documents/thesis.tex or
+  /Work/Documents/thesis.tex.
+
+TeX in every Shell
+  Add these two lines to S:User-Startup (adjust the path):
+    Assign TeX: Work:TeX
+    Execute TeX:S/TeX-Assigns
+
+Requirements
+  68020 or better, AmigaOS 3.x. Memory: pdfLaTeX about 40 MB, LuaLaTeX
+  about 128 MB. ixemul.library 80.1 is included (in TeX/Libs, found by
+  the TeX-Shell). If LIBS: holds an older ixemul.library, the TeX-Shell
+  says so; then copy TeX/Libs/ixemul.library and ixnet.library to LIBS:.
+
+  Tested in an emulator (FS-UAE, Kickstart 3.1, 68030), not yet on real
+  hardware.
+
+Included
+  pdfTeX, LuaTeX (with HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
+  mktexlsr. A texmf tree from TeX Live 2023 with LaTeX, KOMA-Script,
+  TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
+  hyperref, Latin Modern and the latex-extra and science collections;
+  hyphenation for German, English and Greek. Ready formats for pdflatex,
+  pdftex, tex and lualatex.
+
+  Not included: biber (a Perl program; use biblatex with backend=bibtex),
+  XeTeX, Metafont, MetaPost, dvips.
+
+  The first lualatex run builds the font list and takes a few minutes.
+
+More packages
+  Put them into TeX/texmf-local with the same layout as texmf-dist
+  (e.g. texmf-local/tex/latex/mypackage/), then run "mktexlsr" in the
+  TeX-Shell.
+
+Memory settings
+  TeX/texmf.cnf. After changing main_memory, hash_extra, trie_size or
+  hyph_size, rebuild the formats: in the TeX-Shell
+    Execute TeX:MakeFormats
+  (about an hour on a 68030, a few minutes on a Vampire).
+
+More: TeX/README.amiga.md. Source and build scripts:
+  https://github.com/OliverUrbann/texlive-source (branch "amiga")
+
+
+LICENCES
+
+The TeX Live programs and the files of the texmf tree are free software
+under their own licences (GPL, LPPL, OFL and others); see the files
+themselves and https://tug.org/texlive/copying.html.
+
+ixemul.library and ixnet.library 80.1 are free software, from Aminet
+(dev/gcc).

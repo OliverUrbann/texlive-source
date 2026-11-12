@@ -1,3 +1,35 @@
+# TeX Live for AmigaOS 3
+
+This fork of [texlive-source](https://github.com/TeX-Live/texlive-source)
+ports TeX Live to classic AmigaOS 3.x (68020 or better, ixemul.library):
+pdfTeX, LuaTeX with HarfBuzz, TeX, BibTeX, MakeIndex. AmigaOS 4 and MorphOS
+are planned.
+
+**Download:** the
+[releases page](https://github.com/OliverUrbann/texlive-source/releases)
+has a ready package with the programs, a texmf tree from TeX Live 2023
+(LaTeX, KOMA-Script, TikZ, beamer, biblatex, latex-extra, ...) and the
+formats. Unpack it anywhere, double-click `TeX-Shell`, and run
+`pdflatex`, `lualatex`, `bibtex`, `makeindex`.
+
+Status: tested in an emulator (FS-UAE, Kickstart 3.1, 68030) against the
+output of TeX Live on Linux; not yet tested on real hardware.
+
+- [amiga/README.amiga.md](amiga/README.amiga.md): what works, what is
+  missing, how it was done, how to build
+- [amiga/ReadMe](amiga/ReadMe): the user documentation in the package
+  (German and English)
+- [README](README): the original TeX Live source README; the original
+  README.md of TeX-Live/texlive-source follows below
+
+Everything specific to the Amiga is in `amiga/` and inside
+`#if defined (__ixemul__)` in the sources; nothing of TeX Live was
+removed.
+
+---
+
+*Original README.md of TeX-Live/texlive-source:*
+
 $Id$
 
 This README.md file exists for people browsing on github.

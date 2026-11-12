@@ -160,6 +160,6 @@ for p in texk/web2c/tex texk/web2c/pdftex texk/web2c/luatex texk/web2c/luahbtex 
 done
 cp "$src/texk/kpathsea/texmf.cnf" "$dist/texmf-dist/web2c/texmf.cnf"
 cp "$src/amiga/texmf.cnf" "$dist/texmf.cnf"
-cp "$src/amiga/README.amiga.md" "$src/amiga/Install" "$src/amiga/MakeFormats" "$dist/"
+cp "$src/amiga/README.amiga.md" "$src/amiga/MakeFormats" "$dist/"
 echo "== done:"
 ls -l "$dist/bin/m68k-amigaos"

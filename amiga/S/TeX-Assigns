@@ -1,0 +1,31 @@
+; TeX-Assigns: what TeX needs; nothing is copied into the system.
+; Used by the TeX-Shell.  To have TeX in every Shell, put these two lines
+; into S:User-Startup (with your path):
+;   Assign TeX: Work:TeX
+;   Execute TeX:S/TeX-Assigns
+Assign >NIL: EXISTS TeX:
+If WARN
+  Echo "TeX-Assigns: TeX: is not assigned."
+  Quit 10
+EndIf
+
+; ixemul.library: the copy in TeX:Libs is found after LIBS:.  An older
+; ixemul in LIBS: would be found first and is too old for these programs.
+If NOT "$TeXLibsAdded" EQ "yes"
+  Assign LIBS: TeX:Libs ADD
+  SetEnv TeXLibsAdded yes
+EndIf
+Version >NIL: ixemul.library 80
+If WARN
+  Echo "TeX: ixemul.library in LIBS: is older than version 80."
+  Echo "     Copy TeX:Libs/ixemul.library and ixnet.library to LIBS:."
+EndIf
+
+; ixemul asks for the volume AmiTCP: if it does not exist.  A TCP stack
+; normally provides it; otherwise any directory will do.
+Assign >NIL: EXISTS AmiTCP:
+If WARN
+  Assign AmiTCP: TeX:
+EndIf
+
+Path TeX:bin/m68k-amigaos ADD

@@ -1,0 +1,13 @@
+; TeX-Shell: opens a Shell that is set up for TeX.
+; Started by its icon through IconX, which makes the icon's drawer (the
+; TeX drawer) the current directory.  From a Shell:
+;   CD Work:TeX
+;   Execute TeX-Shell
+FailAt 21
+If NOT EXISTS bin/m68k-amigaos/pdftex
+  Echo "TeX-Shell: start me from the TeX drawer (no bin/m68k-amigaos/pdftex here)."
+  Wait 5
+  Quit 20
+EndIf
+Assign TeX: ""
+Run >NIL: NewShell "CON:0/20/640/220/TeX-Shell/AUTO/CLOSE/WAIT" FROM TeX:S/TeX-Startup

@@ -1,9 +1,26 @@
+.key DIR
+.bra {
+.ket }
 ; MakeFormats: build the TeX formats on the Amiga.
-; Run it from the root of the TeX tree:   Execute MakeFormats
+;   Execute MakeFormats [DIR]
+; DIR is the root of the TeX tree (the drawer with bin/ and texmf-dist/);
+; without it, TeX: or the current directory is used.
 ; (TeX Live's fmtutil is a Unix script and cannot run here.)
-; The LaTeX format takes a while: minutes on a fast 68060/Vampire,
-; much longer on a 68030.
+; The LaTeX formats take a while: minutes on a fast 68060/Vampire,
+; much longer on a 68030.  LuaLaTeX needs about 100 MB of free memory.
 FailAt 21
+If NOT "{DIR}" EQ ""
+  CD "{DIR}"
+Else
+  Assign >NIL: EXISTS TeX:
+  If NOT WARN
+    CD TeX:
+  EndIf
+EndIf
+If NOT EXISTS bin/m68k-amigaos/pdftex
+  Echo "MakeFormats: not in a TeX tree (no bin/m68k-amigaos/pdftex)"
+  Quit 20
+EndIf
 Path bin/m68k-amigaos ADD
 If NOT EXISTS texmf-var
   MakeDir texmf-var
@@ -17,6 +34,9 @@ EndIf
 If NOT EXISTS texmf-var/web2c/tex
   MakeDir texmf-var/web2c/tex
 EndIf
+If NOT EXISTS texmf-var/web2c/luahbtex
+  MakeDir texmf-var/web2c/luahbtex
+EndIf
 CD texmf-var/web2c/pdftex
 Echo "== pdflatex.fmt"
 pdftex -ini -interaction=batchmode -jobname=pdflatex -progname=pdflatex -translate-file=cp227.tcx -etex pdflatex.ini
@@ -25,15 +45,7 @@ pdftex -ini -interaction=batchmode -jobname=pdftex -progname=pdftex -translate-f
 CD /tex
 Echo "== tex.fmt"
 tex -ini -interaction=batchmode tex.ini
-CD ///
-mktexlsr
-; LuaLaTeX: Unicode input and OpenType/TrueType fonts.  Building this
-; format needs about 100 MB of free memory; skip it with Ctrl-C or
-; remove these lines on smaller machines.
-If NOT EXISTS texmf-var/web2c/luahbtex
-  MakeDir texmf-var/web2c/luahbtex
-EndIf
-CD texmf-var/web2c/luahbtex
+CD /luahbtex
 Echo "== lualatex.fmt"
 luahbtex -ini -interaction=batchmode -jobname=lualatex lualatex.ini
 CD ///
