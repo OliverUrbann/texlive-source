@@ -1,11 +1,5 @@
 ; TeX-Startup: start-up file of the TeX-Shell (NewShell ... FROM this).
-; The usual Shell start-up first, then the TeX settings.
-If EXISTS S:Shell-Startup
-  Execute S:Shell-Startup
-
-  ; the empty line above: a Shell-Startup whose last line has no newline
-  ; would otherwise be joined with the next line ("dateEndIf")
-EndIf
+; The TeX settings first, then the usual Shell start-up.
 Execute TeX:S/TeX-Assigns
 ; files unpacked into texmf-local (fonts, packages) are found right away;
 ; mktexlsr returns WARN when it found new or removed files
@@ -24,3 +18,8 @@ If "$TeXFontList" EQ "update"
 EndIf
 Echo "TeX Live for AmigaOS 3:  pdflatex  lualatex  bibtex  makeindex  tex"
 Echo "Documents can be anywhere; CD there first.  Help: TeX:ReadMe"
+; The usual Shell start-up comes last, so that it ends this file just as
+; it ends a normal Shell's start-up.  Placed before other lines, some
+; systems joined its last line, when it had no newline, with the next
+; line of this file ("dateEndIf: Unknown command").
+Execute S:Shell-Startup
