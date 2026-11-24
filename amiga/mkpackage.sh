@@ -107,6 +107,8 @@ iconv -f UTF-8 -t ISO-8859-1 "$src/amiga/examples/ReadMe" >"$pkg/examples/ReadMe
 
 echo "== ls-R"
 for d in texmf-dist texmf-local; do
-	(cd "$pkg/$d" && { echo '% ls-R -- filename database for kpathsea; do not change this line.'; ls -R . ; } > ls-R)
+	# same layout as amiga/mktexlsr.c writes ("./:" for the top: kpathsea
+	# ignores files under ".:"), so the TeX-Shell's check finds no change
+	(cd "$pkg/$d" && { echo '% ls-R -- filename database for kpathsea; do not change this line.'; echo; LC_ALL=C ls -R ./ ; } > ls-R)
 done
 du -sh "$pkg"

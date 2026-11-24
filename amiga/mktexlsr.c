@@ -110,7 +110,9 @@ list_dir (FILE *out, const char *root, const char *rel, unsigned long *count)
   qsort (files.v, files.n, sizeof (char *), cmp);
   qsort (dirs.v, dirs.n, sizeof (char *), cmp);
 
-  fprintf (out, "\n%s:\n", rel);
+  /* "./:" for the top, as from "ls -R ./" in the original mktexlsr:
+     kpathsea ignores the files under a plain ".:" line */
+  fprintf (out, "\n%s:\n", strcmp (rel, ".") == 0 ? "./" : rel);
   for (i = 0; i < files.n; i++) {
     fprintf (out, "%s\n", files.v[i]);
     free (files.v[i]);
