@@ -8,10 +8,10 @@ Examples / Beispiele. In the TeX-Shell:
   pdflatex thesis.tex    then: bibtex thesis, pdflatex thesis.tex (twice)
   pdflatex slides.tex
   lualatex unicode.tex
-  lualatex languages.tex (needs TeX-Fonts-Europe.lha, 256 MB)
-  lualatex arabic.tex    (needs TeX-Fonts-Arabic-Hebrew.lha)
-  lualatex hindi.tex     (needs TeX-Fonts-Asia-Africa.lha)
-  lualatex chinese.tex   (needs TeX-Fonts-CJK.lha, 256 MB)
+  lualatex languages.tex (256 MB)
+  lualatex arabic.tex
+  lualatex hindi.tex
+  lualatex chinese.tex   (256 MB)
 
 The first use of a font in lualatex takes a while (it builds a cache).
 Der erste Gebrauch einer Schrift in lualatex dauert etwas (Zwischenspeicher).

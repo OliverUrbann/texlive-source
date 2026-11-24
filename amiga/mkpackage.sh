@@ -111,4 +111,25 @@ for d in texmf-dist texmf-local; do
 	# ignores files under ".:"), so the TeX-Shell's check finds no change
 	(cd "$pkg/$d" && { echo '% ls-R -- filename database for kpathsea; do not change this line.'; echo; LC_ALL=C ls -R ./ ; } > ls-R)
 done
+# lualatex's font list.  Building it on the Amiga reads all 3000 or so
+# fonts (over an hour in the emulator), so build it here with the host's
+# luaotfload-tool (same TeX Live version), on the package's tree only.
+# Fonts in texmf are found again by their file name through kpathsea, so
+# the host paths in the list do not matter.  Only the text form is kept:
+# the .luc is bytecode of the host's Lua.
+if command -v luaotfload-tool >/dev/null; then
+	echo "== font list"
+	tmp=$(mktemp -d)
+	TEXMFDIST="$pkg/texmf-dist" TEXMFMAIN="$pkg/texmf-dist" \
+	TEXMFLOCAL="$pkg/texmf-local" TEXMFHOME=/nonexistent \
+	TEXMFSYSVAR="$tmp" TEXMFVAR="$tmp" TEXMFCONFIG="$tmp" \
+	TEXMFSYSCONFIG="$tmp" TEXMFDEBIAN= TEXMFAUXTREES= OSFONTDIR= \
+		luaotfload-tool --update --force >/dev/null
+	mkdir -p "$pkg/texmf-var/luatex-cache/generic/names"
+	cp "$tmp/luatex-cache/generic/names/luaotfload-names.lua.gz" \
+		"$pkg/texmf-var/luatex-cache/generic/names/"
+	python3 "$src/amiga/fixhexfloat.py" \
+		"$pkg/texmf-var/luatex-cache/generic/names/luaotfload-names.lua.gz"
+	rm -r "$tmp"
+fi
 du -sh "$pkg"

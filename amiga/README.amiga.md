@@ -89,16 +89,31 @@ flag.
 `build.sh`, a texmf tree taken from a list of files (a TeX Live
 installation or the files of Debian/Ubuntu texlive packages), ixemul,
 `TeX-Shell` with its icon (drawn by `amiga/mkicon.py`) and the `ReadMe`.
-The released package used the files of these Ubuntu packages of TeX Live
-2023, without documentation and sources: texlive-base, -latex-base,
--latex-recommended, -latex-extra, -pictures, -fonts-recommended,
--lang-german, -lang-greek, -luatex, -bibtex-extra, -science, lmodern,
-fonts-lmodern; from the texlive-lang-* packages only the hyphenation
-files (`tex/generic/hyph-utf8`, the files the loaders read) and the babel
-language packages (`tex/generic/babel-*`).
+The released package has the complete texmf tree of TeX Live 2023 as
+packaged by Ubuntu 24.04: all packages that `texlive-full` depends on,
+without the `-doc` packages and the programs, plus the font packages that
+`texlive-fonts-extra-links` points to. Install them on the build host,
+then `amiga/mktexmflist.sh` writes the list for `mkpackage.sh`. It leaves
+out documentation and sources and the files of programs that are not
+ported (XeTeX, ConTeXt, dvips, dvipdfmx, xdvi, Metafont, upTeX/pTeX,
+tex4ht). That is about 3.1 GB in 152000 files.
 
-`amiga/mkfontaddons.sh` builds the font add-ons `TeX-Fonts-*.lha` from
-Debian/Ubuntu font packages (see the script for the list).
+`mkpackage.sh` also builds LuaLaTeX's font list (luaotfload's names
+database) with the host's `luaotfload-tool`, on the package's tree only.
+On the Amiga that takes over an hour in the emulator, because luaotfload
+reads all of the 3500 or so OpenType/TrueType fonts. The list stores
+host paths, but luaotfload finds fonts of a texmf tree again by their
+file name through kpathsea, so it works wherever the package is
+unpacked. Two details: only the text form (`.lua.gz`) is shipped, since
+the `.luc` is bytecode of the host's Lua; and the host's Lua writes some
+numbers as hexadecimal floats (`0x0p+0`), which LuaTeX on the Amiga does
+not read (its number conversion uses ixemul's `strtod`), so
+`amiga/fixhexfloat.py` rewrites them as decimals. When files are added
+to `texmf-local`, the TeX-Shell updates the list on the Amiga; since the
+stored paths differ, luaotfload then reads all fonts again.
+
+`amiga/mkfontaddons.sh` built font add-ons for the first package, which
+had a smaller tree; the complete tree has fonts for all scripts.
 
 ## Languages and fonts
 
@@ -119,19 +134,18 @@ babel's language descriptions (`.ini` files, more than 380 languages)
 come with babel itself; the classic `babel-<language>` packages are
 included too.
 
-Fonts are the other half. The base package has Latin Modern (OpenType,
-Latin script) and the Type 1 fonts of TeX Live. The add-ons put further
-OpenType/TrueType fonts into `texmf-local`, which is in kpathsea's search
-path before `texmf-dist`. The TeX-Shell runs `mktexlsr --if-changed
-TeX:texmf-local` at every start, which rewrites that `ls-R` only when
-files were added or removed (it then returns WARN). In that case, and
-when there is no font list yet, the TeX-Shell runs
-`luaotfload-tool --update`. luaotfload would try that by itself during a
-LuaLaTeX run, but on the Amiga that attempt never saves the list, so
-every font looked up by name then starts another search through all
-fonts; why it does not save is not known. Run from the TeX-Shell, the
-tool works (110 fonts of the base package in 92 s on the emulated
-68030 without JIT).
+Fonts are the other half: the tree has fonts for all common scripts
+(CMU, FreeSerif, Amiri, Culmus, Shobhika, TLWG, Fandol, Harano Aji,
+Baekmuk, UnFonts and many more). Further OpenType/TrueType fonts go into
+`texmf-local`, which is in kpathsea's search path before `texmf-dist`.
+The TeX-Shell runs `mktexlsr --if-changed TeX:texmf-local` at every
+start, which rewrites that `ls-R` only when files were added or removed
+(it then returns WARN). In that case, and when there is no font list,
+the TeX-Shell runs `luaotfload-tool --update`. luaotfload would try that
+by itself during a LuaLaTeX run, but on the Amiga that attempt never
+saves the list, so every font looked up by name then starts another
+search through all fonts; why it does not save is not known. Run from
+the TeX-Shell, the tool works.
 
 The formats must be built by the Amiga programs: `Execute MakeFormats` in
 the drawer, on an Amiga or in an emulator. Then pack the drawer with LhA.
@@ -164,7 +178,11 @@ Building the LaTeX format took about 20 minutes on the emulated 68030
 without JIT, a one-page LaTeX document about 15 seconds.
 
 TeX Live's default array sizes allocate well over 100 MB. `amiga/texmf.cnf`
-reduces them to about 40 MB for pdfTeX. The largest item is `main_memory`:
+reduces them to about 56 MB for pdfTeX: `main_memory` 3 million words
+(fixed in the format) plus `extra_mem_top` 2 million words, which is
+added at run time for one-word nodes, i.e. tokens (`extra_mem_bot`, the
+other part, holds boxes and glue and did not help). A 100-page thesis with TikZ and pgfplots needed 3.5
+million. The largest item is `main_memory`:
 the LaTeX kernel's Unicode tables need about 2 million words while the
 format is built, and that high-water mark stays in the format. Plain TeX
 needs far less; lower the values there if RAM is short.

@@ -4,10 +4,12 @@ TeX Live für AmigaOS 3 / TeX Live for AmigaOS 3
 DEUTSCH
 
 Installation
-  Das Archiv irgendwo auspacken, wo etwa 540 MB frei sind:
+  Das Archiv irgendwo auspacken, wo etwa 3,2 GB frei sind
+  (gut 150000 Dateien):
     LhA x TeXLive-Amiga.lha Work:
   Es entsteht das Verzeichnis "TeX". Mehr ist nicht zu tun: es wird nichts
-  ins System kopiert, Formate und Dateidatenbanken liegen fertig bei.
+  ins System kopiert, Formate, Dateidatenbanken und die Schriftenliste
+  für lualatex liegen fertig bei.
 
 Benutzen
   "TeX-Shell" im Verzeichnis TeX doppelt anklicken. Es öffnet sich eine
@@ -26,7 +28,7 @@ TeX in jeder Shell
     Execute TeX:S/TeX-Assigns
 
 Voraussetzungen
-  68020 oder besser, AmigaOS 3.x. Speicher: pdfLaTeX etwa 40 MB, LuaLaTeX
+  68020 oder besser, AmigaOS 3.x. Speicher: pdfLaTeX etwa 56 MB, LuaLaTeX
   128 MB, mit großen Schriften 256 MB. Mitgeliefert wird
   ixemul.library 80.1 (in TeX/Libs, wird von der TeX-Shell gefunden).
   Liegt in LIBS: eine ältere ixemul.library, meldet die TeX-Shell das;
@@ -37,19 +39,28 @@ Voraussetzungen
 
 Enthalten
   pdfTeX, LuaTeX (mit HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
-  mktexlsr. Ein texmf-Baum aus TeX Live 2023 mit LaTeX, KOMA-Script,
-  TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
-  hyperref, Latin Modern und den Sammlungen latex-extra und science;
-  Silbentrennung für 84 Sprachen (lualatex). Fertige Formate für
-  pdflatex, pdftex, tex und lualatex.
+  mktexlsr. Der vollständige texmf-Baum von TeX Live 2023 (alle
+  Sammlungen, ohne Dokumentation und Quelltexte): alle LaTeX-Pakete,
+  alle Schriften (auch cm-super, Iwona und die OpenType-Schriften), alle
+  Sprachen. Fertige Formate für pdflatex, pdftex, tex und lualatex.
 
-  Nicht enthalten: biber (ein Perl-Programm; biblatex mit backend=bibtex
-  verwenden), XeTeX, Metafont, MetaPost, dvips.
+  Nicht enthalten sind Programme, die nicht portiert sind: biber (ein
+  Perl-Programm; biblatex mit backend=bibtex verwenden), XeTeX, ConTeXt,
+  Metafont, MetaPost, dvips, upTeX/pTeX. Ihre Dateien fehlen ebenfalls.
 
-  Beim ersten Start legt die TeX-Shell die Schriftenliste für lualatex
-  an (auf einem 68030 einige Minuten), danach nur, wenn in texmf-local
-  Dateien dazugekommen sind. Der erste Gebrauch einer Schrift in
-  lualatex dauert ebenfalls etwas länger (Zwischenspeicher).
+  Der erste Gebrauch einer Schrift in lualatex dauert etwas länger
+  (Zwischenspeicher in TeX/texmf-var).
+
+  Ältere Dokumente: TeX Live 2023 ist strenger als frühere Versionen.
+  Häufig sind zwei Fehler, die auch unter Linux, Windows oder macOS
+  mit einem aktuellen TeX Live auftreten:
+  - "Class scrbook Error: undefined old font command `\sf'": KOMA-Script
+    kennt \sf, \bf, \it usw. nicht mehr. Abhilfe: Klassenoption
+    enabledeprecatedfontcommands, besser \sffamily, \bfseries, ...
+  - "Package titlesec Error: No format for this command" mit einer
+    KOMA-Script-Klasse: titlesec passt nicht mehr zu KOMA-Script. Wird
+    es nicht wirklich gebraucht (\titleformat), \usepackage{titlesec}
+    streichen.
 
 Sprachen
   Mit lualatex gehen alle Sprachen, die TeX Live kennt: Silbentrennung
@@ -62,8 +73,11 @@ Sprachen
   Siehe TeX/examples/languages.tex, arabic.tex, hindi.tex, chinese.tex.
 
   Gebraucht wird dazu nur eine Schrift, die die Zeichen der Sprache
-  enthält. Im Grundpaket ist Latin Modern (lateinische Schrift). Weitere
-  Schriften gibt es als Zusatzarchive (nächster Abschnitt).
+  enthält. TeX Live bringt Schriften für alle verbreiteten Schriften
+  mit, z. B. CMU Serif und FreeSerif (Latein, Griechisch, Kyrillisch),
+  Amiri (Arabisch), Culmus (Hebräisch), Shobhika (Devanagari), TLWG
+  (Thai), FandolSong (Chinesisch), Harano Aji (Japanisch), Baekmuk und
+  UnFonts (Koreanisch).
 
   pdflatex trennt nur Englisch, Deutsch und Griechisch. Für mehr Sprachen
   in pdflatex die gewünschten Zeilen aus
@@ -74,25 +88,12 @@ Sprachen
   1100000) und "Execute TeX:MakeFormats". (Keine language.dat in
   texmf-local anlegen: die fände auch lualatex.)
 
-Schriften nachinstallieren
-  Zusatzarchive TeX-Fonts-*.lha an derselben Stelle auspacken wie das
-  Grundpaket, also
-    LhA x TeX-Fonts-Europe.lha Work:
-  Die Schriften landen in TeX/texmf-local. Die TeX-Shell bemerkt neue
-  Dateien beim nächsten Start selbst und erneuert die Schriftenliste;
-  also danach einfach eine neue TeX-Shell öffnen.
-
-    TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
-                            Unicode): Latein, Griechisch, Kyrillisch
-    TeX-Fonts-Arabic-Hebrew Amiri, Scheherazade, Noto Naskh/Sans Arabic,
-                            Noto Sans/Serif Hebrew
-    TeX-Fonts-Asia-Africa   Noto für Devanagari, Bengali, Gujarati,
-                            Gurmukhi, Kannada, Malayalam, Oriya, Tamil,
-                            Telugu, Sinhala, Thai, Lao, Khmer, Myanmar,
-                            Tibetisch, Georgisch, Armenisch, Äthiopisch
-    TeX-Fonts-CJK           Droid Sans Fallback: Chinesisch, Japanisch,
-                            Koreanisch (eine Schrift für alle drei,
-                            ohne Fett und Kursiv)
+Eigene Schriften
+  OpenType- oder TrueType-Schriften nach TeX/texmf-local/fonts/opentype/
+  (oder truetype/) kopieren und eine neue TeX-Shell öffnen. Sie bemerkt
+  die neuen Dateien und erneuert die Schriftenliste für lualatex. Das
+  liest alle gut 3000 Schriften neu ein und dauert lange (im Emulator
+  über eine Stunde); danach geht es wieder schnell.
 
   lualatex setzt hier mit HarfBuzz (eingestellt in
   texmf-dist/tex/lualatex/config/fontspec.cfg). Das ist nötig: der
@@ -101,16 +102,12 @@ Schriften nachinstallieren
   wenige MB.
 
   Speicher (getestet im Emulator):
-    128 MB  ein Schriftsystem, z. B. Russisch, Arabisch, Hindi
+    128 MB  ein Schriftsystem, z. B. Russisch, Arabisch
     256 MB  Chinesisch (große Schrift), languages.tex (fünf Sprachen)
   babel lädt die Schrift für jede Sprache neu. Für mehrere europäische
   Sprachen deshalb CMU Serif nehmen; FreeSerif ist viel größer und
   reicht für ein, zwei Sprachen pro Dokument. Viele Schriftsysteme in
   einem Dokument brauchen mehr, als lualatex auf dem Amiga bekommt.
-
-  Jede andere OpenType- oder TrueType-Schrift geht genauso: nach
-  TeX/texmf-local/fonts/opentype/ (oder truetype/) kopieren, neue
-  TeX-Shell öffnen.
 
   Beim ersten Gebrauch einer Schrift legt lualatex einen Zwischenspeicher
   an; das dauert bei großen Schriften (CJK) mehrere Minuten.
@@ -134,10 +131,12 @@ Mehr: TeX/README.amiga.md. Quelltext und Build-Skripte:
 ENGLISH
 
 Installation
-  Unpack the archive anywhere with about 540 MB free:
+  Unpack the archive anywhere with about 3.2 GB free (some 150000
+  files):
     LhA x TeXLive-Amiga.lha Work:
   This creates the drawer "TeX". That is all: nothing is copied into the
-  system, formats and file name databases are included.
+  system, formats, file name databases and lualatex's font list are
+  included.
 
 Use
   Double-click "TeX-Shell" in the TeX drawer. It opens a Shell with the
@@ -156,7 +155,7 @@ TeX in every Shell
     Execute TeX:S/TeX-Assigns
 
 Requirements
-  68020 or better, AmigaOS 3.x. Memory: pdfLaTeX about 40 MB, LuaLaTeX
+  68020 or better, AmigaOS 3.x. Memory: pdfLaTeX about 56 MB, LuaLaTeX
   128 MB, 256 MB with big fonts. ixemul.library 80.1 is included (in
   TeX/Libs, found by the TeX-Shell). If LIBS: holds an older
   ixemul.library, the TeX-Shell says so; then copy
@@ -167,19 +166,27 @@ Requirements
 
 Included
   pdfTeX, LuaTeX (with HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
-  mktexlsr. A texmf tree from TeX Live 2023 with LaTeX, KOMA-Script,
-  TikZ/pgfplots, beamer, biblatex, natbib, amsmath, siunitx, listings,
-  hyperref, Latin Modern and the latex-extra and science collections;
-  hyphenation for 84 languages (lualatex). Ready formats for pdflatex,
-  pdftex, tex and lualatex.
+  mktexlsr. The complete texmf tree of TeX Live 2023 (all collections,
+  without documentation and sources): all LaTeX packages, all fonts
+  (including cm-super, Iwona and the OpenType fonts), all languages.
+  Ready formats for pdflatex, pdftex, tex and lualatex.
 
-  Not included: biber (a Perl program; use biblatex with backend=bibtex),
-  XeTeX, Metafont, MetaPost, dvips.
+  Not included are the programs that are not ported: biber (a Perl
+  program; use biblatex with backend=bibtex), XeTeX, ConTeXt, Metafont,
+  MetaPost, dvips, upTeX/pTeX. Their files are left out as well.
 
-  The first time it starts, the TeX-Shell builds the font list for
-  lualatex (several minutes on a 68030), afterwards only when files were
-  added to texmf-local. The first use of a font in lualatex also takes
-  longer (it builds a cache).
+  The first use of a font in lualatex takes longer (it builds a cache in
+  TeX/texmf-var).
+
+  Older documents: TeX Live 2023 is stricter than earlier versions. Two
+  errors are common; they occur with a current TeX Live on Linux,
+  Windows or macOS as well:
+  - "Class scrbook Error: undefined old font command `\sf'": KOMA-Script
+    no longer knows \sf, \bf, \it etc. Fix: class option
+    enabledeprecatedfontcommands, better \sffamily, \bfseries, ...
+  - "Package titlesec Error: No format for this command" with a
+    KOMA-Script class: titlesec no longer works with KOMA-Script. If it
+    is not really used (\titleformat), remove \usepackage{titlesec}.
 
 Languages
   lualatex handles every language TeX Live knows: hyphenation for 84
@@ -191,9 +198,11 @@ Languages
     \babelfont{rm}{CMU Serif}
   See TeX/examples/languages.tex, arabic.tex, hindi.tex, chinese.tex.
 
-  All it needs is a font with the characters of the language. The base
-  package has Latin Modern (Latin script). More fonts come as add-on
-  archives (next section).
+  All it needs is a font with the characters of the language. TeX Live
+  has fonts for all common scripts, e.g. CMU Serif and FreeSerif (Latin,
+  Greek, Cyrillic), Amiri (Arabic), Culmus (Hebrew), Shobhika
+  (Devanagari), TLWG (Thai), FandolSong (Chinese), Harano Aji
+  (Japanese), Baekmuk and UnFonts (Korean).
 
   pdflatex hyphenates only English, German and Greek. For more languages
   in pdflatex, copy the lines you want from
@@ -204,25 +213,12 @@ Languages
   "Execute TeX:MakeFormats". (Do not put a language.dat into
   texmf-local: lualatex would find it too.)
 
-Adding fonts
-  Unpack the add-on archives TeX-Fonts-*.lha where you unpacked the base
-  package:
-    LhA x TeX-Fonts-Europe.lha Work:
-  The fonts go into TeX/texmf-local. The TeX-Shell notices new files the
-  next time it starts and updates the font list; so just open a new
-  TeX-Shell afterwards.
-
-    TeX-Fonts-Europe        FreeSerif/Sans/Mono, CMU (Computer Modern
-                            Unicode): Latin, Greek, Cyrillic
-    TeX-Fonts-Arabic-Hebrew Amiri, Scheherazade, Noto Naskh/Sans Arabic,
-                            Noto Sans/Serif Hebrew
-    TeX-Fonts-Asia-Africa   Noto for Devanagari, Bengali, Gujarati,
-                            Gurmukhi, Kannada, Malayalam, Oriya, Tamil,
-                            Telugu, Sinhala, Thai, Lao, Khmer, Myanmar,
-                            Tibetan, Georgian, Armenian, Ethiopic
-    TeX-Fonts-CJK           Droid Sans Fallback: Chinese, Japanese,
-                            Korean (one font for all three, no bold or
-                            italic)
+Your own fonts
+  Copy OpenType or TrueType fonts to TeX/texmf-local/fonts/opentype/ (or
+  truetype/) and open a new TeX-Shell. It notices the new files and
+  updates lualatex's font list. That reads all of the 3000 or so fonts
+  again and takes long (over an hour in the emulator); afterwards it is
+  fast again.
 
   lualatex shapes text with HarfBuzz here (set in
   texmf-dist/tex/lualatex/config/fontspec.cfg). This is necessary: the
@@ -230,15 +226,12 @@ Adding fonts
   reads a big font such as FreeSerif or Amiri; HarfBuzz needs a few MB.
 
   Memory (tested in the emulator):
-    128 MB  one script, e.g. Russian, Arabic, Hindi
+    128 MB  one script, e.g. Russian, Arabic
     256 MB  Chinese (big font), languages.tex (five languages)
   babel loads the font again for every language. So use CMU Serif for
   several European languages; FreeSerif is much bigger and fine for one
   or two languages per document. Many scripts in one document need more
   than lualatex gets on the Amiga.
-
-  Any other OpenType or TrueType font works the same way: copy it to
-  TeX/texmf-local/fonts/opentype/ (or truetype/), open a new TeX-Shell.
 
   The first time a font is used, lualatex builds a cache for it; for big
   fonts (CJK) that takes several minutes.
@@ -267,7 +260,3 @@ themselves and https://tug.org/texlive/copying.html.
 
 ixemul.library and ixnet.library 80.1 are free software, from Aminet
 (dev/gcc).
-
-The fonts in the add-on archives are free fonts (SIL Open Font License,
-GPL with font exception, Apache 2.0); their licences are in
-TeX/texmf-local/doc/fonts/.

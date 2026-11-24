@@ -5,13 +5,16 @@
 % texmf-dist/web2c/texmf.cnf, and the first value found wins.
 %
 % TeX Live's defaults allocate well over 100 MB at startup.  The values
-% below need about 40 MB and are enough for ordinary LaTeX documents.
+% below need about 56 MB and are enough for big documents (a 100-page
+% thesis with TikZ/pgfplots needed 3.5 million words of main memory).
 % With more RAM (e.g. a Vampire) raise them; after changing main_memory,
 % hash_extra, trie_size or hyph_size the formats must be rebuilt.
 
 main_memory = 3000000     % words of 8 bytes: 24 MB; building the LaTeX
                           % format needs about 2000000
-extra_mem_top = 0
+extra_mem_top = 2000000   % 16 MB more for pdfTeX at run time, without
+                          % rebuilding the formats: for tokens (macros,
+                          % pgfplots data); 0 saves the 16 MB
 extra_mem_bot = 0
 font_mem_size = 1500000   % words of 4 bytes: 6 MB
 font_max = 2000

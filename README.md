@@ -7,17 +7,15 @@ are planned.
 
 **Download:** the
 [releases page](https://github.com/OliverUrbann/texlive-source/releases)
-has a ready package with the programs, a texmf tree from TeX Live 2023
-(LaTeX, KOMA-Script, TikZ, beamer, biblatex, latex-extra, ...) and the
-formats. Unpack it anywhere, double-click `TeX-Shell`, and run
+has a ready package with the programs, the complete texmf tree of TeX
+Live 2023 (all packages, fonts and languages, without documentation) and
+the formats. Unpack it anywhere, double-click `TeX-Shell`, and run
 `pdflatex`, `lualatex`, `bibtex`, `makeindex`.
 
 **Languages:** with `lualatex`, hyphenation for all 84 languages of TeX
-Live and babel's descriptions of more than 380 languages are included.
-Fonts for other scripts come as small add-on archives on the same page
-(`TeX-Fonts-Europe`, `-Arabic-Hebrew`, `-Asia-Africa`, `-CJK`): unpack
-them where the package was unpacked. Any other OpenType/TrueType font
-can be dropped into `TeX/texmf-local` the same way.
+Live and babel's descriptions of more than 380 languages are included,
+and the tree has fonts for all common scripts. Further OpenType/TrueType
+fonts can be dropped into `TeX/texmf-local`.
 
 Status: tested in an emulator (FS-UAE, Kickstart 3.1, 68030) against the
 output of TeX Live on Linux; not yet tested on real hardware.

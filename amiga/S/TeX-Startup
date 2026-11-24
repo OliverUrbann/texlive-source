@@ -8,7 +8,7 @@ If WARN
   Set TeXFontList update
 EndIf
 ; LuaLaTeX's font list: built once, and again after changes in texmf-local
-If NOT EXISTS TeX:texmf-var/luatex-cache/generic/names/luaotfload-names.luc.gz
+If NOT EXISTS TeX:texmf-var/luatex-cache/generic/names/luaotfload-names.lua.gz
   Set TeXFontList update
 EndIf
 If "$TeXFontList" EQ "update"
