@@ -2,6 +2,9 @@
 ; The usual Shell start-up first, then the TeX settings.
 If EXISTS S:Shell-Startup
   Execute S:Shell-Startup
+
+  ; the empty line above: a Shell-Startup whose last line has no newline
+  ; would otherwise be joined with the next line ("dateEndIf")
 EndIf
 Execute TeX:S/TeX-Assigns
 ; files unpacked into texmf-local (fonts, packages) are found right away;
