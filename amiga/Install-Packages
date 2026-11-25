@@ -11,6 +11,10 @@
 
 (set @app-name "TeX Live")
 
+; in Novice mode the Installer would skip all questions and take the
+; defaults: the choices below are the point of this script
+(if (< @user-level 1) (user 1))
+
 (welcome
   (if #de
     "TeX Live für AmigaOS: Pakete installieren"
