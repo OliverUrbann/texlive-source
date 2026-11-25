@@ -8,7 +8,8 @@
    depend on the size of the package (only the xz dictionary, at most a
    few MB for TeX Live's containers).
 
-   usage: tlunpack [-c sha512] [-l listfile] [-d destdir] file.tar.xz
+   usage: tlunpack [-c sha512] [-l listfile] [-d destdir] [-x prefix]
+                   file.tar.xz
           tlunpack -s file          print the SHA-512 of a file
 
      -c sha512   expected SHA-512 (hex, as in texlive.tlpdb); unpack only
@@ -17,6 +18,8 @@
                  line, relative to destdir (for uninstalling later)
      -d destdir  where to unpack (default: current directory); an Amiga
                  path like TeX: works
+     -x prefix   skip the files whose names start with prefix (e.g. tlpkg/:
+                 tlmgr's own files)
 
    Exit code: 0 ok, 5 (WARN) checksum mismatch, 10 (ERROR) other errors.
    Plain C with stdio; no Amiga-specific code apart from path joining, so
@@ -139,6 +142,7 @@ octal (const char *p, int len)
 }
 
 static char destdir[1024] = "";
+static const char *skip_prefix = NULL;
 
 /* destdir + "/" + rel; an Amiga device name ("TeX:") needs no slash */
 static void
@@ -290,6 +294,18 @@ untar (FILE *list)
     while (strncmp (name, "./", 2) == 0)
       memmove (name, name + 2, strlen (name) - 1);
 
+    if (skip_prefix && strncmp (name, skip_prefix, strlen (skip_prefix)) == 0) {
+      if (type == '0' || type == '\0' || type == '7') {
+        left = (size + 511) / 512 * 512;
+        while (left > 0) {
+          size_t n = left > sizeof buf ? sizeof buf : left;
+          if (xz_read (buf, n) != n)
+            fail ("%s: truncated tar archive", "input");
+          left -= n;
+        }
+      }
+      continue;
+    }
     if (!safe_name (name))
       fail ("refusing to unpack %s", name);
     join (path, sizeof path, name);
@@ -366,7 +382,7 @@ static void
 usage (void)
 {
   fprintf (stderr,
-           "usage: %s [-c sha512] [-l listfile] [-d destdir] file.tar.xz\n"
+           "usage: %s [-c sha512] [-l listfile] [-d destdir] [-x prefix] file.tar.xz\n"
            "       %s -s file\n", prog, prog);
   exit (RC_ERROR);
 }
@@ -390,6 +406,8 @@ main (int argc, char **argv)
       listname = argv[++i];
     else if (strcmp (argv[i], "-d") == 0 && i + 1 < argc)
       snprintf (destdir, sizeof destdir, "%s", argv[++i]);
+    else if (strcmp (argv[i], "-x") == 0 && i + 1 < argc)
+      skip_prefix = argv[++i];
     else if (argv[i][0] == '-' || file)
       usage ();
     else

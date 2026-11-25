@@ -1,0 +1,169 @@
+; Install-Packages: Installer script of TeX Live for AmigaOS.
+;
+; Started by its icon (default tool Installer) in the TeX drawer.  Asks
+; what to install and where from, then runs the package installer
+; (TeX:tlpkg/tlinst.lua, in texlua) in a Shell window that shows the
+; progress.  It only adds packages to this TeX drawer; nothing is copied
+; into the system.  Run it again to add more.  In the TeX-Shell the same
+; works without this script, e.g.:  tlinst install collection-langfrench
+
+(set #de (= @language "deutsch"))
+
+(set @app-name "TeX Live")
+
+(welcome
+  (if #de
+    "TeX Live für AmigaOS: Pakete installieren"
+    "TeX Live for AmigaOS: install packages"))
+
+(if (not (exists "bin/m68k-amigaos/luahbtex"))
+  (abort
+    (if #de
+      "Dieses Skript muss im TeX-Schublade liegen (dort fehlt bin/m68k-amigaos/luahbtex)."
+      "This script must be in the TeX drawer (bin/m68k-amigaos/luahbtex is missing here).")))
+
+(set #root (pathonly (expandpath "TeX-Shell")))
+(makeassign "TeX" #root)
+(run "Execute TeX:S/TeX-Assigns" (safe))
+
+(set #scheme
+  (askchoice
+    (prompt
+      (if #de
+        "Was soll installiert werden?\n(Größen: Download über das Netz)"
+        "What should be installed?\n(Sizes: download over the network)"))
+    (help
+      (if #de
+        (cat "Basis: LaTeX mit den Grundpaketen, ca. 19 MB.\n\n"
+             "Paper/Abschlussarbeit: dazu die empfohlenen und weiteren LaTeX-Pakete, "
+             "TikZ/pgfplots, Mathematik/Informatik, BibTeX-Stile und die "
+             "Standardschriften, ca. 190 MB. Das reicht für fast alle Arbeiten.\n\n"
+             "Alles: das vollständige TeX Live 2025 ohne Dokumentation, ca. 1,4 GB "
+             "und 175.000 Dateien.\n\n"
+             "Einzelne Pakete kann man später in der TeX-Shell nachinstallieren: "
+             "tlinst install <paket>")
+        (cat "Basic: LaTeX with the base packages, about 19 MB.\n\n"
+             "Paper/thesis: plus the recommended and additional LaTeX packages, "
+             "TikZ/pgfplots, mathematics/computer science, BibTeX styles and the "
+             "standard fonts, about 190 MB. Enough for almost any paper or thesis.\n\n"
+             "Everything: all of TeX Live 2025 without documentation, about 1.4 GB "
+             "and 175,000 files.\n\n"
+             "Single packages can be added later in the TeX-Shell: "
+             "tlinst install <package>")))
+    (choices
+      (if #de "Basis (LaTeX), 19 MB" "Basic (LaTeX), 19 MB")
+      (if #de "Paper/Abschlussarbeit, 190 MB" "Paper/thesis, 190 MB")
+      (if #de "Alles, 1,4 GB" "Everything, 1.4 GB"))
+    (default 1)))
+
+(set #langs
+  (askoptions
+    (prompt (if #de "Sprachen und Schriften dazu:" "Languages and fonts in addition:"))
+    (help
+      (if #de
+        (cat "Englisch ist immer dabei. Jede Sprache bringt Silbentrennung und "
+             "Babel-Unterstützung mit.\n\n"
+             "Bei \"Alles\" sind alle Sprachen und Schriften schon enthalten.")
+        (cat "English is always included. Each language brings hyphenation and "
+             "babel support.\n\n"
+             "\"Everything\" includes all languages and fonts already.")))
+    (choices
+      (if #de "Deutsch, 7 MB" "German, 7 MB")
+      (if #de "Weitere europäische Sprachen, 100 MB" "Other European languages, 100 MB")
+      (if #de "Arabisch, Hebräisch, Indisch u.a., 40 MB" "Arabic, Hebrew, Indic and others, 40 MB")
+      (if #de "Chinesisch, Japanisch, Koreanisch, 100 MB" "Chinese, Japanese, Korean, 100 MB")
+      (if #de "Zusatzschriften, 670 MB" "Extra fonts, 670 MB"))
+    (default 1)))
+
+(set #src
+  (askchoice
+    (prompt (if #de "Woher sollen die Pakete kommen?" "Where should the packages come from?"))
+    (help
+      (if #de
+        (cat "Internet: der eingefrorene Stand von TeX Live 2025 im Archiv der "
+             "University of Utah, über HTTP (ein TCP/IP-Stack muss laufen).\n\n"
+             "Anderer Server: ein anderer Spiegel desselben Ordners "
+             "(.../texlive/2025/tlnet-final), nur http://.\n\n"
+             "Lokaler Ordner: eine Kopie von tlnet-final (mit dem Unterordner "
+             "archive), z. B. am PC heruntergeladen.")
+        (cat "Internet: the frozen TeX Live 2025 in the archive of the University "
+             "of Utah, over HTTP (a TCP/IP stack must be running).\n\n"
+             "Other server: another mirror of the same directory "
+             "(.../texlive/2025/tlnet-final), http:// only.\n\n"
+             "Local directory: a copy of tlnet-final (with its archive "
+             "subdirectory), e.g. downloaded on a PC.")))
+    (choices
+      "Internet: ftp.math.utah.edu"
+      (if #de "Anderer Server" "Other server")
+      (if #de "Lokaler Ordner" "Local directory"))
+    (default 0)))
+
+(set #repo "")
+(if (= #src 1)
+  (set #repo
+    (cat " --repository "
+      (askstring
+        (prompt (if #de "Adresse des Servers (tlnet-final von 2025):" "Server address (tlnet-final of 2025):"))
+        (help (if #de "Nur http://, kein https://." "Only http://, no https://."))
+        (default "http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final")))))
+(if (= #src 2)
+  (set #repo
+    (cat " --repository \""
+      (askdir
+        (prompt (if #de "Ordner tlnet-final (mit archive darin):" "Directory tlnet-final (with archive in it):"))
+        (help (if #de "Der Ordner, in dem archive/ liegt." "The directory that holds archive/."))
+        (default "RAM:"))
+      "\"")))
+
+(set #pkgs "")
+(if (= #scheme 0) (set #pkgs "scheme-basic"))
+(if (= #scheme 1)
+  (set #pkgs
+    (cat "scheme-basic collection-latexrecommended collection-latexextra "
+         "collection-pictures collection-fontsrecommended collection-bibtexextra "
+         "collection-mathscience")))
+(if (= #scheme 2) (set #pkgs "scheme-full"))
+(if (IN #langs 0) (set #pkgs (cat #pkgs " collection-langgerman")))
+(if (IN #langs 1)
+  (set #pkgs
+    (cat #pkgs " collection-langeuropean collection-langfrench collection-langitalian"
+         " collection-langspanish collection-langportuguese collection-langpolish"
+         " collection-langczechslovak collection-langcyrillic collection-langgreek")))
+(if (IN #langs 2) (set #pkgs (cat #pkgs " collection-langarabic collection-langother")))
+(if (IN #langs 3) (set #pkgs (cat #pkgs " collection-langcjk")))
+(if (IN #langs 4) (set #pkgs (cat #pkgs " collection-fontsextra")))
+
+(message
+  (if #de
+    (cat "Jetzt werden die Pakete installiert. Ein Fenster zeigt den Fortschritt.\n\n"
+         "Danach werden die Formate und die Schriftenliste für LuaLaTeX gebaut: "
+         "auf einem schnellen Amiga einige Minuten, auf einem 68030 deutlich länger.\n\n"
+         "Bricht etwas ab, das Skript einfach noch einmal starten: "
+         "Fertige Pakete werden nicht neu geladen.")
+    (cat "The packages are installed now. A window shows the progress.\n\n"
+         "Afterwards the formats and LuaLaTeX's font list are built: a few minutes "
+         "on a fast Amiga, much longer on a 68030.\n\n"
+         "If something breaks off, just start this script again: packages that are "
+         "done are not loaded again.")))
+
+(working (if #de "Installiere TeX-Live-Pakete ..." "Installing TeX Live packages ..."))
+(set #rc
+  (run
+    (cat "TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua" #repo
+         " install " #pkgs
+         " >\"CON:0/20/640/220/TeX Live/AUTO/WAIT/CLOSE\"")))
+
+(if (> #rc 0)
+  (message
+    (if #de
+      (cat "Nicht alles wurde installiert (Fehlercode " #rc "). "
+           "Das Fenster nennt die fehlenden Pakete. Das Skript noch einmal starten, "
+           "um es erneut zu versuchen.")
+      (cat "Not everything was installed (return code " #rc "). "
+           "The window lists the missing packages. Start this script again "
+           "to try again."))))
+
+(exit
+  (if #de
+    "Fertig. TeX startet man mit dem Symbol TeX-Shell."
+    "Done. Start TeX with the TeX-Shell icon."))

@@ -29,3 +29,8 @@ If WARN
 EndIf
 
 Path TeX:bin/m68k-amigaos ADD
+
+; texlua is luahbtex under another name; tlinst installs and removes
+; TeX Live packages (TeX:tlpkg/tlinst.lua)
+Alias texlua TeX:bin/m68k-amigaos/luahbtex --luaonly []
+Alias tlinst TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua []

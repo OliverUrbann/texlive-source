@@ -4,10 +4,12 @@ A port of parts of TeX Live to classic AmigaOS 3.x: 68020 or better,
 `ixemul.library`. AmigaOS 4 and MorphOS are planned but not started; the
 code is laid out so they can be added (see "Other Amiga systems").
 
-A ready package (programs, texmf tree, formats) is on the
+A ready package is on the
 [releases page](https://github.com/OliverUrbann/texlive-source/releases):
-unpack it anywhere and double-click `TeX-Shell`. Its `ReadMe` (German and
-English) explains the use; this file is about the port itself.
+the programs and a package installer (about 6 MB). Unpack it anywhere,
+double-click `Install-Packages` to load the TeX Live packages you want,
+then `TeX-Shell`. Its `ReadMe` (German and English) explains the use;
+this file is about the port itself.
 
 ## Programs
 
@@ -21,9 +23,13 @@ English) explains the use; this file is about the port itself.
 | `makeindex` | indexes and glossaries |
 | `kpsewhich` | finds files the way TeX does |
 | `mktexlsr` | writes the `ls-R` file name databases (new, in C; the original is a shell script) |
+| `tlunpack` | checks and unpacks TeX Live package containers (new, in C) |
+| `tlinst` | the package installer, a texlua script (`tlpkg/tlinst.lua`, new) |
 
 `pdflatex` and `lualatex` are the same files as `pdftex` and `luahbtex`
-under another name, as in TeX Live.
+under another name, as in TeX Live; `tlinst` makes these copies on the
+Amiga, so that the archive stays small. `luatex` is built but not in the
+package: `luahbtex` does all it does.
 
 ## Status
 
@@ -83,7 +89,50 @@ On Linux, with the m68k-amigaos toolchain from
 The result is in `build-dir/dist/TeX`. The script explains each compiler
 flag.
 
-## Making the package
+## Installing packages (tlinst)
+
+The programs of this port belong to one TeX Live year (the source is
+trunk of July 2025, so TeX Live 2025), and so must the packages. The
+installer therefore takes them from the *frozen* release of that year
+in TUG's historic archive, which never changes:
+`http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final/`.
+Plain HTTP, since texlua has no TLS on AmigaOS 3; the SHA-512 sums of
+`texlive.tlpdb` protect the downloads. (Note: that server refuses
+HTTP/1.0 requests; luasocket uses HTTP/1.1.)
+
+- `amiga/tlinst/mkindex.py` turns `texlive.tlpdb` (20 MB) into
+  `tlpkg/tlinst.idx` (1 MB): names, categories, dependencies, container
+  sizes and checksums, `execute` lines, short descriptions. Left out:
+  platform packages, and the engines that are not ported (`EXCLUDE`).
+- `amiga/tlinst/tlinst.lua` (texlua; `tlnet.lua` does the HTTP part)
+  resolves dependencies, downloads `archive/<name>.tar.xz` (or takes it
+  from a local copy of `tlnet-final`), unpacks it with `tlunpack`, and
+  keeps a list of the files of each package (`tlpkg/lists`) for `remove`.
+  Then it does what tlmgr and updmap do on Unix: `language.dat`,
+  `language.def`, `language.dat.lua` from the `AddHyphen` lines and
+  `pdftex.map` from the `addMap`/`addMixedMap` lines (as updmap with its
+  default settings), all in `texmf-var`; checked to be identical with the
+  files `install-tl` makes for the same packages. Then ls-R, the formats
+  (`MakeFormats`) and luaotfload's font list, if needed.
+- `amiga/tlinst/tlunpack.c`: SHA-512 (pplib's code), xz (XZ Embedded,
+  in `amiga/tlinst/xz`) and tar, all streamed, so memory does not depend
+  on the size of a package. Also builds for the host
+  (`build-tlunpack.sh`).
+- `amiga/Install-Packages`: the Workbench front end, an Installer script.
+- `amiga/mkcore.sh` puts the drawer together, optionally with packages
+  already in it (installed with `tlinst` on the host; the formats are
+  then built at the first start of the TeX-Shell).
+
+The same `tlinst.lua` runs on the build host (with TeX Live's Linux
+texlua and a host `tlunpack`), with `--root`, `--no-formats`,
+`--no-fontlist` and `--mktexlsr lua`.
+
+In FS-UAE (68030 with JIT) scheme-basic, 114 packages, installs over the
+network in about three minutes including formats; per package the
+download and unpacking take well under a second, a font package of
+some MB a few seconds.
+
+## Making the package (complete tree, the old way)
 
 `amiga/mkpackage.sh` puts the drawer together: the programs from
 `build.sh`, a texmf tree taken from a list of files (a TeX Live
@@ -226,8 +275,10 @@ Everything is inside `#if defined (__ixemul__)`.
   directory from AmigaDOS (`GetProgramDir`), because `argv[0]` and a `PATH`
   variable do not help on the Amiga; Amiga path to Unix path; the missing
   math functions, `nanosleep`, `localtime_r`, `gmtime_r`; `getaddrinfo`
-  and friends, which always fail; three newlib symbols that the
-  toolchain's libstdc++ expects.
+  and friends (IPv4, on top of `gethostbyname`, for luasocket);
+  `system()` through the AmigaDOS shell (`SystemTags`), because ixemul's
+  runs `/bin/sh` (this makes Lua's `os.execute` and `\write18` work);
+  three newlib symbols that the toolchain's libstdc++ expects.
 - `texk/kpathsea/progname.c`: uses the program directory; sets `PATH` if
   there is none (Lua libraries expect it); `KPATHSEA_DEBUG_OUTPUT` works
   as on Windows (the 3.1 Shell cannot redirect stderr).
@@ -236,7 +287,7 @@ Everything is inside `#if defined (__ixemul__)`.
   `luatexdir/lua/luainit.c`: locking; Amiga paths on the command line.
 - `luatexdir/luasocket/src/amiga-ipv6.h` (new), `usocket.h`: IPv6
   definitions so that luasocket compiles. The socket library is off by
-  default in LuaTeX; name lookup does not work.
+  default in LuaTeX (but there in texlua, which `tlinst` uses).
 - `luatexdir/luaffi/ffi.h`: no `dlfcn.h`/`sys/mman.h`; ffi is a stub on
   m68k as on other unsupported processors.
 - `luatexdir/luafilesystem/src/lfs.c`: `lfs.lock` succeeds without
@@ -246,6 +297,8 @@ Everything is inside `#if defined (__ixemul__)`.
   (HarfBuzz and Graphite are C++). `amiga/build.sh` explains it.
 - ICU is left out of the build although TeX Live lists it as a dependency
   of HarfBuzz; HarfBuzz does not use it.
+- `amiga/tlinst/`, `amiga/Install-Packages`, `amiga/mkcore.sh` (new):
+  the package installer, see above.
 - `amiga/mktexlsr.c`, `amiga/MakeFormats`, `amiga/TeX-Shell`, `amiga/S/`,
   `amiga/mkpackage.sh`, `amiga/mkicon.py`, `amiga/ReadMe`,
   `amiga/texmf.cnf`, `amiga/build.sh`, `amiga/tests/mathtest.c` (new).

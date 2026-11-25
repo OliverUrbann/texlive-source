@@ -8,16 +8,32 @@ If WARN
   Set TeXFontList update
 EndIf
 ; LuaLaTeX's font list: built once, and again after changes in texmf-local
+; (tlinst updates it itself after installing fonts)
 If NOT EXISTS TeX:texmf-var/luatex-cache/generic/names/luaotfload-names.lua.gz
   Set TeXFontList update
+EndIf
+If NOT EXISTS TeX:texmf-dist/scripts/luaotfload/luaotfload-tool.lua
+  UnSet TeXFontList
 EndIf
 If "$TeXFontList" EQ "update"
   Echo "Updating the font list for LuaLaTeX (a minute on a fast Amiga, more on a 68030) ..."
   TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:texmf-dist/scripts/luaotfload/luaotfload-tool.lua --update >NIL:
   UnSet TeXFontList
 EndIf
+; no formats yet: packages came with the archive (build them now), or
+; none are installed
+If NOT EXISTS TeX:texmf-var/web2c/pdftex/pdflatex.fmt
+  If EXISTS TeX:texmf-dist/tex/latex/base/latex.ltx
+    Echo "First start: building the formats (minutes on a fast Amiga, more on a 68030) ..."
+    tlinst config
+  Else
+    Echo "No TeX packages installed yet: start Install-Packages in the TeX drawer,"
+    Echo "or here:  tlinst install scheme-basic"
+  EndIf
+EndIf
 Echo "TeX Live for AmigaOS 3:  pdflatex  lualatex  bibtex  makeindex  tex"
-Echo "Documents can be anywhere; CD there first.  Help: TeX:ReadMe"
+Echo "More packages:  tlinst install <name>   Documents can be anywhere; CD there first."
+Echo "Help: TeX:ReadMe"
 ; The usual Shell start-up comes last, so that it ends this file just as
 ; it ends a normal Shell's start-up.  Placed before other lines, some
 ; systems joined its last line, when it had no newline, with the next

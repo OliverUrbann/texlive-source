@@ -39,6 +39,7 @@
 #include <dos/dos.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
+#include <dos/dostags.h>
 #undef timeval
 
 /* ---- Stack ---------------------------------------------------------
@@ -156,6 +157,32 @@ nanosleep (const struct timespec *req, struct timespec *rem)
     rem->tv_nsec = 0;
   }
   return 0;
+}
+
+/* ---- system -----------------------------------------------------------
+
+   ixemul's system() runs "/bin/sh -c command", and an Amiga has no
+   /bin/sh: every command failed with 127 (LuaTeX's os.execute, pdfTeX's
+   \write18).  This one hands the command line to the AmigaDOS shell, so
+   commands, Amiga paths and redirection work as in a Shell window.  It
+   returns the command's return code (0, 5 WARN, 10 ERROR, 20 FAIL), or
+   -1 if it could not be started.  The linker takes this definition
+   instead of ixemul's, because this object is always linked (see the
+   top of this file).  */
+
+int
+system (const char *command)
+{
+  LONG rc;
+
+  if (command == NULL)
+    return 1;                           /* a shell is there */
+  fflush (NULL);                        /* keep the output in order */
+  rc = SystemTags ((STRPTR) command,
+                   SYS_UserShell, TRUE,
+                   NP_StackSize, 262144,
+                   TAG_DONE);
+  return (int) rc;
 }
 
 /* ---- getaddrinfo and friends ----------------------------------------

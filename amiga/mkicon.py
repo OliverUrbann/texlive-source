@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""mkicon.py: write the Workbench icon (.info) for the TeX-Shell script.
+"""mkicon.py: write a Workbench project icon (.info).
 
-usage: mkicon.py OUTPUT.info
+usage: mkicon.py OUTPUT.info [DEFAULT-TOOL [TOOLTYPE ...]]
+
+Without DEFAULT-TOOL: the icon of the TeX-Shell script (IconX).  The
+installer icon is made with "Installer" and its tool types (SCRIPT=...).
 
 A project icon (WBPROJECT) whose default tool is IconX, which runs the
 script with the icon's drawer as current directory.  The picture is
@@ -105,9 +108,10 @@ def string(s):
     return struct.pack(">L", len(b)) + b
 
 
-def main(out):
-    tool = "C:IconX"
-    tooltypes = ["WINDOW=NIL:", "DELAY=0"]
+def main(out, tool=None, tooltypes=None):
+    if not tool:
+        tool = "C:IconX"
+        tooltypes = ["WINDOW=NIL:", "DELAY=0"]
     gadget = struct.pack(
         ">LhhHHHHHLLLLLHL",
         0,              # NextGadget
@@ -143,4 +147,5 @@ def main(out):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None,
+         sys.argv[3:])

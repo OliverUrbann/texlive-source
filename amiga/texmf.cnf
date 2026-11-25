@@ -24,8 +24,9 @@ string_vacancies = 90000
 max_strings = 150000
 pool_free = 47500
 buf_size = 200000
-trie_size = 400000        % enough for a few languages; all of
-                          % language.dat needs about 1100000
+trie_size = 1100000       % for the hyphenation patterns of all languages
+                          % (only formats are built with this much: it
+                          % costs about 10 MB while building them)
 save_size = 100000
 stack_size = 5000
 

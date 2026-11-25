@@ -4,12 +4,22 @@ TeX Live für AmigaOS 3 / TeX Live for AmigaOS 3
 DEUTSCH
 
 Installation
-  Das Archiv irgendwo auspacken, wo etwa 3,2 GB frei sind
-  (gut 150000 Dateien):
+  Das Archiv irgendwo auspacken:
     LhA x TeXLive-Amiga.lha Work:
-  Es entsteht das Verzeichnis "TeX". Mehr ist nicht zu tun: es wird nichts
-  ins System kopiert, Formate, Dateidatenbanken und die Schriftenliste
-  für lualatex liegen fertig bei.
+  Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
+  TeX-Pakete. Dann im Verzeichnis TeX "Install-Packages" doppelt
+  anklicken und den Umfang wählen:
+    Basis (LaTeX)             19 MB Download,   ca. 100 MB auf der Platte
+    Paper/Abschlussarbeit    190 MB Download,   ca. 600 MB
+    Alles                    1,4 GB Download,   ca. 4 GB, 175000 Dateien
+  dazu Sprachen und Zusatzschriften. Die Pakete kommen aus dem
+  eingefrorenen TeX Live 2025 (über HTTP aus dem Archiv der University of
+  Utah, oder aus einem Ordner, wenn man sie am PC heruntergeladen hat:
+  .../texlive/2025/tlnet-final). Danach werden die Formate und die
+  Schriftenliste für lualatex gebaut. Es wird nichts ins System kopiert.
+
+  Bricht etwas ab (Netz, Platte voll), Install-Packages einfach noch
+  einmal starten: fertige Pakete werden nicht noch einmal geladen.
 
 Benutzen
   "TeX-Shell" im Verzeichnis TeX doppelt anklicken. Es öffnet sich eine
@@ -34,24 +44,25 @@ Voraussetzungen
   Liegt in LIBS: eine ältere ixemul.library, meldet die TeX-Shell das;
   dann TeX/Libs/ixemul.library und ixnet.library nach LIBS: kopieren.
 
-  Getestet im Emulator (FS-UAE, Kickstart 3.1, 68030), noch nicht auf
-  echter Hardware.
+  Zum Installieren über das Netz: ein TCP/IP-Stack (Miami, Roadshow,
+  AmiTCP). Getestet im Emulator (FS-UAE, Kickstart 3.1, 68030); die
+  vorige Fassung auch auf AmiKit.
 
 Enthalten
   pdfTeX, LuaTeX (mit HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
-  mktexlsr. Der vollständige texmf-Baum von TeX Live 2023 (alle
-  Sammlungen, ohne Dokumentation und Quelltexte): alle LaTeX-Pakete,
-  alle Schriften (auch cm-super, Iwona und die OpenType-Schriften), alle
-  Sprachen. Fertige Formate für pdflatex, pdftex, tex und lualatex.
+  mktexlsr und der Paket-Installer (tlinst). Die TeX-Pakete sind die von
+  TeX Live 2025 (eingefrorener Stand, ohne Dokumentation und
+  Quelltexte); sie werden mit Install-Packages oder tlinst geladen.
 
   Nicht enthalten sind Programme, die nicht portiert sind: biber (ein
   Perl-Programm; biblatex mit backend=bibtex verwenden), XeTeX, ConTeXt,
-  Metafont, MetaPost, dvips, upTeX/pTeX. Ihre Dateien fehlen ebenfalls.
+  Metafont, MetaPost, dvips, upTeX/pTeX. Ihre Pakete lässt der
+  Installer weg.
 
   Der erste Gebrauch einer Schrift in lualatex dauert etwas länger
   (Zwischenspeicher in TeX/texmf-var).
 
-  Ältere Dokumente: TeX Live 2023 ist strenger als frühere Versionen.
+  Ältere Dokumente: TeX Live 2025 ist strenger als frühere Versionen.
   Häufig sind zwei Fehler, die auch unter Linux, Windows oder macOS
   mit einem aktuellen TeX Live auftreten:
   - "Class scrbook Error: undefined old font command `\sf'": KOMA-Script
@@ -63,9 +74,9 @@ Enthalten
     streichen.
 
 Sprachen
-  Mit lualatex gehen alle Sprachen, die TeX Live kennt: Silbentrennung
-  für 84 Sprachen und babel-Beschreibungen für über 380 Sprachen sind
-  enthalten. Beispiel:
+  Mit lualatex gehen alle Sprachen, die TeX Live kennt, wenn ihre Pakete
+  installiert sind (Install-Packages: Sprachen; oder z. B.
+  "tlinst install collection-langcyrillic"). Beispiel:
     \usepackage[bidi=basic]{babel}
     \babelprovide[import, main]{german}
     \babelprovide[import]{russian}
@@ -79,21 +90,14 @@ Sprachen
   (Thai), FandolSong (Chinesisch), Harano Aji (Japanisch), Baekmuk und
   UnFonts (Koreanisch).
 
-  pdflatex trennt nur Englisch, Deutsch und Griechisch. Für mehr Sprachen
-  in pdflatex die gewünschten Zeilen aus
-    TeX/texmf-dist/tex/luatex/config/language.dat     (alle Sprachen)
-  in
-    TeX/texmf-dist/tex/generic/config/language.dat    (nur pdflatex)
-  übernehmen, in TeX/texmf.cnf trie_size erhöhen (alle Sprachen:
-  1100000) und "Execute TeX:MakeFormats". (Keine language.dat in
-  texmf-local anlegen: die fände auch lualatex.)
+  pdflatex und lualatex trennen alle installierten Sprachen; der
+  Installer baut die Formate nach dem Installieren einer Sprache neu.
 
 Eigene Schriften
   OpenType- oder TrueType-Schriften nach TeX/texmf-local/fonts/opentype/
   (oder truetype/) kopieren und eine neue TeX-Shell öffnen. Sie bemerkt
-  die neuen Dateien und erneuert die Schriftenliste für lualatex. Das
-  liest alle gut 3000 Schriften neu ein und dauert lange (im Emulator
-  über eine Stunde); danach geht es wieder schnell.
+  die neuen Dateien und erneuert die Schriftenliste für lualatex (mit
+  vielen installierten Schriften dauert das eine Weile).
 
   lualatex setzt hier mit HarfBuzz (eingestellt in
   texmf-dist/tex/lualatex/config/fontspec.cfg). Das ist nötig: der
@@ -113,10 +117,18 @@ Eigene Schriften
   an; das dauert bei großen Schriften (CJK) mehrere Minuten.
 
 Weitere Pakete
-  In TeX/texmf-local ablegen, mit derselben Verzeichnisstruktur wie
-  texmf-dist (z. B. texmf-local/tex/latex/meinpaket/). Die TeX-Shell
-  findet sie beim nächsten Start; sonst "mktexlsr TeX:texmf-local".
-  Pakete gibt es auf https://ctan.org.
+  Aus TeX Live, in der TeX-Shell:
+    tlinst info pgfplots          was es braucht und wie groß es ist
+    tlinst install pgfplots       installieren (mit allem, was es braucht)
+    tlinst remove pgfplots        entfernen
+    tlinst list collections       Sammlungen (list schemes, list installed)
+  Optionen: --repository <http://... oder Ordner>, --proxy <http://...>.
+  Formate und Schriftenliste erneuert tlinst selbst, wenn nötig.
+
+  Eigene oder neuere Pakete von https://ctan.org in TeX/texmf-local
+  ablegen, mit derselben Verzeichnisstruktur wie texmf-dist (z. B.
+  texmf-local/tex/latex/meinpaket/). Die TeX-Shell findet sie beim
+  nächsten Start; sonst "mktexlsr TeX:texmf-local".
 
 Speicher anpassen
   TeX/texmf.cnf. Nach Änderungen an main_memory, hash_extra, trie_size
@@ -131,12 +143,22 @@ Mehr: TeX/README.amiga.md. Quelltext und Build-Skripte:
 ENGLISH
 
 Installation
-  Unpack the archive anywhere with about 3.2 GB free (some 150000
-  files):
+  Unpack the archive anywhere:
     LhA x TeXLive-Amiga.lha Work:
-  This creates the drawer "TeX". That is all: nothing is copied into the
-  system, formats, file name databases and lualatex's font list are
-  included.
+  This creates the drawer "TeX" with the programs, but no TeX packages
+  yet. Then double-click "Install-Packages" in the TeX drawer and choose
+  what to install:
+    Basic (LaTeX)             19 MB download,   about 100 MB on disk
+    Paper/thesis             190 MB download,   about 600 MB
+    Everything               1.4 GB download,   about 4 GB, 175000 files
+  plus languages and extra fonts. The packages come from the frozen
+  TeX Live 2025 (over HTTP from the archive of the University of Utah, or
+  from a directory if you downloaded them on a PC:
+  .../texlive/2025/tlnet-final). Then the formats and lualatex's font
+  list are built. Nothing is copied into the system.
+
+  If something breaks off (network, disk full), just start
+  Install-Packages again: packages that are done are not loaded again.
 
 Use
   Double-click "TeX-Shell" in the TeX drawer. It opens a Shell with the
@@ -161,24 +183,24 @@ Requirements
   ixemul.library, the TeX-Shell says so; then copy
   TeX/Libs/ixemul.library and ixnet.library to LIBS:.
 
-  Tested in an emulator (FS-UAE, Kickstart 3.1, 68030), not yet on real
-  hardware.
+  To install over the network: a TCP/IP stack (Miami, Roadshow,
+  AmiTCP). Tested in an emulator (FS-UAE, Kickstart 3.1, 68030); the
+  previous version on AmiKit as well.
 
 Included
   pdfTeX, LuaTeX (with HarfBuzz), TeX, BibTeX, MakeIndex, kpsewhich,
-  mktexlsr. The complete texmf tree of TeX Live 2023 (all collections,
-  without documentation and sources): all LaTeX packages, all fonts
-  (including cm-super, Iwona and the OpenType fonts), all languages.
-  Ready formats for pdflatex, pdftex, tex and lualatex.
+  mktexlsr and the package installer (tlinst). The TeX packages are those
+  of TeX Live 2025 (the frozen release, without documentation and
+  sources); they are loaded with Install-Packages or tlinst.
 
   Not included are the programs that are not ported: biber (a Perl
   program; use biblatex with backend=bibtex), XeTeX, ConTeXt, Metafont,
-  MetaPost, dvips, upTeX/pTeX. Their files are left out as well.
+  MetaPost, dvips, upTeX/pTeX. The installer leaves their packages out.
 
   The first use of a font in lualatex takes longer (it builds a cache in
   TeX/texmf-var).
 
-  Older documents: TeX Live 2023 is stricter than earlier versions. Two
+  Older documents: TeX Live 2025 is stricter than earlier versions. Two
   errors are common; they occur with a current TeX Live on Linux,
   Windows or macOS as well:
   - "Class scrbook Error: undefined old font command `\sf'": KOMA-Script
@@ -189,9 +211,9 @@ Included
     is not really used (\titleformat), remove \usepackage{titlesec}.
 
 Languages
-  lualatex handles every language TeX Live knows: hyphenation for 84
-  languages and babel descriptions for more than 380 languages are
-  included. Example:
+  lualatex handles every language TeX Live knows, once its packages are
+  installed (Install-Packages: languages; or e.g.
+  "tlinst install collection-langcyrillic"). Example:
     \usepackage[bidi=basic]{babel}
     \babelprovide[import, main]{english}
     \babelprovide[import]{russian}
@@ -204,21 +226,14 @@ Languages
   (Devanagari), TLWG (Thai), FandolSong (Chinese), Harano Aji
   (Japanese), Baekmuk and UnFonts (Korean).
 
-  pdflatex hyphenates only English, German and Greek. For more languages
-  in pdflatex, copy the lines you want from
-    TeX/texmf-dist/tex/luatex/config/language.dat     (all languages)
-  to
-    TeX/texmf-dist/tex/generic/config/language.dat    (pdflatex only),
-  raise trie_size in TeX/texmf.cnf (all languages: 1100000) and run
-  "Execute TeX:MakeFormats". (Do not put a language.dat into
-  texmf-local: lualatex would find it too.)
+  pdflatex and lualatex hyphenate all installed languages; the installer
+  rebuilds the formats after a language is installed.
 
 Your own fonts
   Copy OpenType or TrueType fonts to TeX/texmf-local/fonts/opentype/ (or
   truetype/) and open a new TeX-Shell. It notices the new files and
-  updates lualatex's font list. That reads all of the 3000 or so fonts
-  again and takes long (over an hour in the emulator); afterwards it is
-  fast again.
+  updates lualatex's font list (with many fonts installed, that takes a
+  while).
 
   lualatex shapes text with HarfBuzz here (set in
   texmf-dist/tex/lualatex/config/fontspec.cfg). This is necessary: the
@@ -237,10 +252,18 @@ Your own fonts
   fonts (CJK) that takes several minutes.
 
 More packages
-  Put them into TeX/texmf-local with the same layout as texmf-dist
-  (e.g. texmf-local/tex/latex/mypackage/). The TeX-Shell finds them the
-  next time it starts; otherwise run "mktexlsr TeX:texmf-local".
-  Packages are on https://ctan.org.
+  From TeX Live, in the TeX-Shell:
+    tlinst info pgfplots          what it needs and how big it is
+    tlinst install pgfplots       install (with all it needs)
+    tlinst remove pgfplots        remove
+    tlinst list collections       collections (list schemes, list installed)
+  Options: --repository <http://... or directory>, --proxy <http://...>.
+  tlinst rebuilds the formats and the font list itself when needed.
+
+  Your own or newer packages from https://ctan.org go into
+  TeX/texmf-local, with the same layout as texmf-dist (e.g.
+  texmf-local/tex/latex/mypackage/). The TeX-Shell finds them the next
+  time it starts; otherwise run "mktexlsr TeX:texmf-local".
 
 Memory settings
   TeX/texmf.cnf. After changing main_memory, hash_extra, trie_size or
@@ -260,3 +283,6 @@ themselves and https://tug.org/texlive/copying.html.
 
 ixemul.library and ixnet.library 80.1 are free software, from Aminet
 (dev/gcc).
+
+tlunpack uses XZ Embedded (public domain / 0BSD) and the SHA-512 code
+of pplib (part of LuaTeX).

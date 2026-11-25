@@ -15,7 +15,7 @@ local ltn12  = require("ltn12")
 
 local M = {}
 
-M.TIMEOUT = 60          -- seconds without data before giving up
+M.TIMEOUT = 30          -- seconds without data before giving up
 M.RETRIES = 3
 M.USERAGENT = "TeXLive-Amiga-Installer"
 
@@ -32,6 +32,18 @@ local function counting(sink, size, progress)
   end, function() return got end
 end
 
+-- Name lookups are slow on a 68k (and some TCP stacks): look each host
+-- up once and connect to the address, with the name in the Host header.
+local addr = {}
+local function direct(url, opt)
+  if opt.proxy then return url, nil end
+  local host, rest = url:match("^http://([^/:]+)(.*)$")
+  if not host or host:match("^%d+%.%d+%.%d+%.%d+$") then return url, nil end
+  if addr[host] == nil then addr[host] = socket.dns.toip(host) or false end
+  if not addr[host] then return url, nil end
+  return "http://" .. addr[host] .. rest, { host = host }
+end
+
 local function once(url, file, opt)
   local tmp = file .. ".part"
   local f, err = io.open(tmp, "wb")
@@ -39,10 +51,13 @@ local function once(url, file, opt)
   local sink, count = counting(ltn12.sink.file(f), opt.size, opt.progress)
   http.TIMEOUT = M.TIMEOUT
   http.USERAGENT = M.USERAGENT
+  local u, headers = direct(url, opt)
   local r, code = http.request{
-    url = url, sink = sink, proxy = opt.proxy, redirect = true,
+    url = u, headers = headers, sink = sink, proxy = opt.proxy, redirect = true,
   }
-  -- ltn12.sink.file closes the file at the end of the data
+  -- ltn12.sink.file closes the file at the end of the data, but not when
+  -- the transfer breaks off; AmigaDOS cannot delete an open file
+  if not r or code ~= 200 then pcall(f.close, f) end
   if not r then os.remove(tmp); return nil, tostring(code) end
   if code ~= 200 then os.remove(tmp); return nil, "HTTP " .. tostring(code) end
   if opt.size and count() ~= opt.size then
@@ -76,7 +91,8 @@ function M.get(url, opt)
   http.TIMEOUT = M.TIMEOUT
   http.USERAGENT = M.USERAGENT
   local t = {}
-  local r, code = http.request{ url = url, sink = ltn12.sink.table(t),
+  local u, headers = direct(url, opt)
+  local r, code = http.request{ url = u, headers = headers, sink = ltn12.sink.table(t),
                                 proxy = opt.proxy, redirect = true }
   if not r then return nil, tostring(code) end
   if code ~= 200 then return nil, "HTTP " .. tostring(code) end
