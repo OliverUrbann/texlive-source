@@ -38,7 +38,7 @@
         "What should be installed?\n(Sizes: download over the network)"))
     (help
       (if #de
-        (cat "Basis: LaTeX mit den Grundpaketen, ca. 19 MB.\n\n"
+        (cat "Minimal: LaTeX mit den Grundpaketen, ca. 19 MB. Alles Weitere lässt sich später nachladen.\n\n"
              "Paper/Abschlussarbeit: dazu die empfohlenen und weiteren LaTeX-Pakete, "
              "TikZ/pgfplots, Mathematik/Informatik, BibTeX-Stile und die "
              "Standardschriften, ca. 190 MB. Das reicht für fast alle Arbeiten.\n\n"
@@ -46,7 +46,7 @@
              "und 175.000 Dateien.\n\n"
              "Einzelne Pakete kann man später in der TeX-Shell nachinstallieren: "
              "tlinst install <paket>")
-        (cat "Basic: LaTeX with the base packages, about 19 MB.\n\n"
+        (cat "Minimal: LaTeX with the base packages, about 19 MB. Anything else can be added later.\n\n"
              "Paper/thesis: plus the recommended and additional LaTeX packages, "
              "TikZ/pgfplots, mathematics/computer science, BibTeX styles and the "
              "standard fonts, about 190 MB. Enough for almost any paper or thesis.\n\n"
@@ -55,10 +55,10 @@
              "Single packages can be added later in the TeX-Shell: "
              "tlinst install <package>")))
     (choices
-      (if #de "Basis (LaTeX), 19 MB" "Basic (LaTeX), 19 MB")
+      (if #de "Minimal (LaTeX), 19 MB" "Minimal (LaTeX), 19 MB")
       (if #de "Paper/Abschlussarbeit, 190 MB" "Paper/thesis, 190 MB")
       (if #de "Alles, 1,4 GB" "Everything, 1.4 GB"))
-    (default 1)))
+    (default 0)))
 
 (set #langs
   (askoptions

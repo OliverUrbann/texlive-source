@@ -9,7 +9,7 @@ Installation
   Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
   TeX-Pakete. Dann im Verzeichnis TeX "Install-Packages" doppelt
   anklicken und den Umfang wählen:
-    Basis (LaTeX)             19 MB Download,   ca. 100 MB auf der Platte
+    Minimal (LaTeX)           19 MB Download,   ca. 100 MB auf der Platte
     Paper/Abschlussarbeit    190 MB Download,   ca. 600 MB
     Alles                    1,4 GB Download,   ca. 4 GB, 175000 Dateien
   dazu Sprachen und Zusatzschriften. Die Pakete kommen aus dem
@@ -148,7 +148,7 @@ Installation
   This creates the drawer "TeX" with the programs, but no TeX packages
   yet. Then double-click "Install-Packages" in the TeX drawer and choose
   what to install:
-    Basic (LaTeX)             19 MB download,   about 100 MB on disk
+    Minimal (LaTeX)           19 MB download,   about 100 MB on disk
     Paper/thesis             190 MB download,   about 600 MB
     Everything               1.4 GB download,   about 4 GB, 175000 files
   plus languages and extra fonts. The packages come from the frozen
