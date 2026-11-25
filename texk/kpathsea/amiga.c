@@ -29,6 +29,8 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 /* The NDK's devices/timer.h defines struct timeval again; ixemul's
    <sys/time.h> already did.  Rename the NDK one, we do not use it.  */
@@ -159,40 +161,178 @@ nanosleep (const struct timespec *req, struct timespec *rem)
 /* ---- getaddrinfo and friends ----------------------------------------
 
    ixemul.library declares them in <netdb.h> but does not have them.
-   Only LuaTeX's socket library (off unless --socket is given) uses
-   them.  These always fail: no network name lookup in LuaTeX on
-   AmigaOS 3 until someone writes one on top of gethostbyname.  */
+   LuaTeX's socket library (luasocket) needs them.  IPv4 only, on top of
+   gethostbyname and getservbyname, which the TCP stack provides.  */
+
+static struct addrinfo *
+amiga_ai_new (struct in_addr addr, int port, int socktype, int protocol)
+{
+  struct addrinfo *ai;
+  struct sockaddr_in *sin;
+
+  ai = calloc (1, sizeof (*ai) + sizeof (*sin));
+  if (!ai)
+    return NULL;
+  sin = (struct sockaddr_in *) (ai + 1);
+  sin->sin_len = sizeof (*sin);
+  sin->sin_family = AF_INET;
+  sin->sin_port = htons (port);
+  sin->sin_addr = addr;
+  ai->ai_family = AF_INET;
+  ai->ai_socktype = socktype;
+  ai->ai_protocol = protocol;
+  ai->ai_addrlen = sizeof (*sin);
+  ai->ai_addr = (struct sockaddr *) sin;
+  return ai;
+}
 
 int
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 {
-  (void) node; (void) service; (void) hints;
-  if (res)
-    *res = NULL;
-  return EAI_FAIL;
+  int flags = hints ? hints->ai_flags : 0;
+  int family = hints ? hints->ai_family : AF_UNSPEC;
+  int socktype = hints ? hints->ai_socktype : 0;
+  int protocol = hints ? hints->ai_protocol : 0;
+  struct in_addr one, *addrs[2], **list;
+  struct hostent *hp = NULL;
+  struct addrinfo *first = NULL, **next = &first;
+  int port = 0;
+
+  if (!res)
+    return EAI_FAIL;
+  *res = NULL;
+  if (!node && !service)
+    return EAI_NONAME;
+  if (family != AF_UNSPEC && family != AF_INET)
+    return EAI_FAMILY;
+  if (socktype == 0)
+    socktype = SOCK_STREAM;
+  if (socktype != SOCK_STREAM && socktype != SOCK_DGRAM)
+    return EAI_SOCKTYPE;
+
+  if (service && *service) {
+    char *end;
+    long n = strtol (service, &end, 10);
+    if (*end == '\0' && n >= 0 && n <= 65535)
+      port = (int) n;
+    else if (flags & AI_NUMERICSERV)
+      return EAI_NONAME;
+    else {
+      struct servent *se = getservbyname (service,
+                                          socktype == SOCK_DGRAM ? "udp" : "tcp");
+      if (!se)
+        return EAI_SERVICE;
+      port = ntohs (se->s_port);
+    }
+  }
+
+  addrs[1] = NULL;
+  list = addrs;
+  if (!node) {
+    one.s_addr = htonl ((flags & AI_PASSIVE) ? INADDR_ANY : INADDR_LOOPBACK);
+    addrs[0] = &one;
+  } else if (inet_aton (node, &one)) {
+    addrs[0] = &one;
+  } else if (flags & AI_NUMERICHOST) {
+    return EAI_NONAME;
+  } else {
+    hp = gethostbyname (node);
+    if (!hp || hp->h_addrtype != AF_INET || !hp->h_addr_list[0])
+      return EAI_NONAME;
+    list = (struct in_addr **) hp->h_addr_list;
+  }
+
+  for (; *list; list++) {
+    struct addrinfo *ai = amiga_ai_new (**list, port, socktype, protocol);
+    if (!ai) {
+      freeaddrinfo (first);
+      return EAI_MEMORY;
+    }
+    *next = ai;
+    next = &ai->ai_next;
+  }
+  if ((flags & AI_CANONNAME) && first) {
+    first->ai_canonname = strdup (hp ? hp->h_name : node ? node : "");
+    if (!first->ai_canonname) {
+      freeaddrinfo (first);
+      return EAI_MEMORY;
+    }
+  }
+  *res = first;
+  return 0;
 }
 
 void
 freeaddrinfo (struct addrinfo *res)
 {
-  (void) res;
+  while (res) {
+    struct addrinfo *next = res->ai_next;
+    free (res->ai_canonname);
+    free (res);
+    res = next;
+  }
 }
 
 int
 getnameinfo (const struct sockaddr *sa, socklen_t salen, char *host,
              socklen_t hostlen, char *serv, socklen_t servlen, int flags)
 {
-  (void) sa; (void) salen; (void) host; (void) hostlen;
-  (void) serv; (void) servlen; (void) flags;
-  return EAI_FAIL;
+  const struct sockaddr_in *sin = (const struct sockaddr_in *) sa;
+
+  if (!sa || sa->sa_family != AF_INET || salen < (socklen_t) sizeof (*sin))
+    return EAI_FAMILY;
+  if (host && hostlen) {
+    const char *name = NULL;
+    if (!(flags & NI_NUMERICHOST)) {
+      struct hostent *hp = gethostbyaddr ((const char *) &sin->sin_addr,
+                                          sizeof (sin->sin_addr), AF_INET);
+      if (hp)
+        name = hp->h_name;
+    }
+    if (!name) {
+      if (flags & NI_NAMEREQD)
+        return EAI_NONAME;
+      name = inet_ntoa (sin->sin_addr);
+    }
+    if (strlen (name) >= (size_t) hostlen)
+      return EAI_OVERFLOW;
+    strcpy (host, name);
+  }
+  if (serv && servlen) {
+    char buf[16];
+    const char *name = NULL;
+    if (!(flags & NI_NUMERICSERV)) {
+      struct servent *se = getservbyport (sin->sin_port,
+                                          (flags & NI_DGRAM) ? "udp" : "tcp");
+      if (se)
+        name = se->s_name;
+    }
+    if (!name) {
+      sprintf (buf, "%u", (unsigned) ntohs (sin->sin_port));
+      name = buf;
+    }
+    if (strlen (name) >= (size_t) servlen)
+      return EAI_OVERFLOW;
+    strcpy (serv, name);
+  }
+  return 0;
 }
 
 char *
 gai_strerror (int code)
 {
-  (void) code;
-  return (char *) "name lookup is not available on AmigaOS 3";
+  switch (code) {
+  case EAI_AGAIN:    return (char *) "temporary failure in name resolution";
+  case EAI_FAIL:     return (char *) "non-recoverable failure in name resolution";
+  case EAI_FAMILY:   return (char *) "address family not supported";
+  case EAI_MEMORY:   return (char *) "memory allocation failure";
+  case EAI_NONAME:   return (char *) "host or service not known";
+  case EAI_SERVICE:  return (char *) "service not supported for socket type";
+  case EAI_SOCKTYPE: return (char *) "socket type not supported";
+  case EAI_OVERFLOW: return (char *) "argument buffer overflow";
+  default:           return (char *) "name resolution error";
+  }
 }
 
 /* ---- Math ------------------------------------------------------------
