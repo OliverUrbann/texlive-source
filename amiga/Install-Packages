@@ -73,14 +73,18 @@
              "mit \"Alle Pakete\" sind Kyrillisch, Griechisch und CJK kleiner, "
              "weil sich die Schriften überschneiden.\n\n"
              "Japanisch geht nur mit lualatex (luatexja); pLaTeX gibt es nicht.\n\n"
-             "Zusatzschriften: über 400 Schriftfamilien. Meist braucht man nur eine; "
-             "die lädt man besser einzeln in der TeX-Shell, z. B.: tlinst install iwona")
+             "Beliebte Schriften: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
+             "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+             "Alle Zusatzschriften: über 400 Schriftfamilien. Meist braucht man nur eine; "
+             "die lädt man besser einzeln in der TeX-Shell, z. B.: tlinst install noto")
         (cat "Each language brings hyphenation, babel support and its fonts. The "
              "sizes are in addition to Paper/thesis; with \"All packages\" Cyrillic, "
              "Greek and CJK are smaller, since the fonts overlap.\n\n"
              "Japanese works with lualatex only (luatexja); there is no pLaTeX.\n\n"
-             "Extra fonts: more than 400 font families. Usually one of them is "
-             "needed; better load it alone in the TeX-Shell, e.g.: tlinst install iwona")))
+             "Popular fonts: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
+             "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+             "All extra fonts: more than 400 font families. Usually one of them is "
+             "needed; better load it alone in the TeX-Shell, e.g.: tlinst install noto")))
     (choices
       (if #de "Europäische Sprachen (lateinische Schrift, mit Deutsch), 11 MB"
               "European languages (Latin script, with German), 11 MB")
@@ -91,7 +95,9 @@
       (if #de "Chinesisch, 130 MB" "Chinese, 130 MB")
       (if #de "Japanisch (nur lualatex), 144 MB" "Japanese (lualatex only), 144 MB")
       (if #de "Koreanisch, 134 MB" "Korean, 134 MB")
-      (if #de "Zusatzschriften, 650 MB" "Extra fonts, 650 MB"))
+      (if #de "Beliebte Schriften (newtx, Libertinus, STIX2 u.a.), 53 MB"
+              "Popular fonts (newtx, Libertinus, STIX2 and others), 53 MB")
+      (if #de "Alle Zusatzschriften, 650 MB" "All extra fonts, 650 MB"))
     (default 0)))
 
 (set #src
@@ -161,7 +167,12 @@
 (if (IN #langs 4) (set #pkgs (cat #pkgs " collection-langchinese")))
 (if (IN #langs 5) (set #pkgs (cat #pkgs " collection-langjapanese")))
 (if (IN #langs 6) (set #pkgs (cat #pkgs " collection-langkorean")))
-(if (IN #langs 7) (set #pkgs (cat #pkgs " collection-fontsextra")))
+(if (IN #langs 7)
+  (set #pkgs
+    (cat #pkgs " newtx newtxtt libertinus libertinus-type1 libertinus-otf"
+         " libertinus-fonts inconsolata sourcesanspro sourcecodepro sourceserifpro"
+         " stix2-otf stix2-type1 ebgaramond kpfonts mlmodern iwona fontawesome")))
+(if (IN #langs 8) (set #pkgs (cat #pkgs " collection-fontsextra")))
 
 (message
   (if #de

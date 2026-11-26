@@ -18,7 +18,9 @@ Installation
     Kyrillisch 68 MB, Griechisch 66 MB
     Arabisch, Hebräisch, Indisch und weitere                  35 MB
     Chinesisch 130 MB, Japanisch 144 MB (nur lualatex), Koreanisch 134 MB
-    Zusatzschriften (über 400 Schriftfamilien)               650 MB
+    Beliebte Schriften (newtx, Libertinus, STIX2, Source Pro,
+      Inconsolata, EB Garamond, kpfonts, MLModern, Iwona)      53 MB
+    Alle Zusatzschriften (über 400 Schriftfamilien)          650 MB
   Einzelne Schriften lädt man besser gezielt in der TeX-Shell, z. B.
   "tlinst install iwona". Die Pakete kommen aus dem eingefrorenen
   TeX Live 2025 (über HTTP aus dem Archiv der University of Utah, oder
@@ -166,7 +168,9 @@ Installation
     Cyrillic 68 MB, Greek 66 MB
     Arabic, Hebrew, Indic and others                          35 MB
     Chinese 130 MB, Japanese 144 MB (lualatex only), Korean 134 MB
-    Extra fonts (more than 400 font families)                650 MB
+    Popular fonts (newtx, Libertinus, STIX2, Source Pro,
+      Inconsolata, EB Garamond, kpfonts, MLModern, Iwona)      53 MB
+    All extra fonts (more than 400 font families)            650 MB
   Single fonts are better loaded on their own in the TeX-Shell, e.g.
   "tlinst install iwona". The packages come from the frozen TeX Live 2025
   (over HTTP from the archive of the University of Utah, or from a
