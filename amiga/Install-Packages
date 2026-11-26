@@ -187,11 +187,18 @@
          "If something breaks off, just start this script again: packages that are "
          "done are not loaded again.")))
 
+; the list goes into a file: AmigaDOS takes no command lines of this length
+(if (exists "T:TeX-Packages") (delete "T:TeX-Packages" (safe)))
+(textfile
+  (dest "T:TeX-Packages")
+  (append #pkgs)
+  (safe))
+
 (working (if #de "Installiere TeX-Live-Pakete ..." "Installing TeX Live packages ..."))
 (set #rc
   (run
     (cat "TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua" #repo
-         " install " #pkgs
+         " --list T:TeX-Packages install"
          " >\"CON:0/20/640/220/TeX Live/AUTO/WAIT/CLOSE\"")))
 
 (if (> #rc 0)

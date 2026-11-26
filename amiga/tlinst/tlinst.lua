@@ -22,6 +22,9 @@
 --   --keep              keep downloaded containers (in tlpkg/download)
 --   --no-formats        do not build formats
 --   --no-fontlist       do not update LuaLaTeX's font list
+--   --list FILE         read more names from FILE (separated by spaces or
+--                       lines): AmigaDOS command lines are limited to
+--                       about 500 characters
 --   --tlunpack PROG     the tlunpack program (default: in bin/m68k-amigaos)
 --   --mktexlsr PROG     the mktexlsr program (default: in bin/m68k-amigaos;
 --                       "lua" uses the slower built-in version)
@@ -62,8 +65,11 @@ local function mkdirs(p)               -- create p and its parents
   return isdir(p)
 end
 
+-- on stdout as well: started from the Installer, only stdout has a
+-- window
 local function die(msg)
-  io.stderr:write("tlinst: ", msg, "\n")
+  io.stdout:write("tlinst: ", msg, "\n")
+  io.stdout:flush()
   os.exit(10)
 end
 
@@ -108,6 +114,10 @@ do
     if a == "--root" then opt.root = val()
     elseif a == "--repository" then opt.repo = val()
     elseif a == "--proxy" then opt.proxy = val()
+    elseif a == "--list" then
+      local f = io.open(val(), "r") or die("cannot read " .. arg[i])
+      for n in f:read("a"):gmatch("%S+") do names[#names + 1] = n end
+      f:close()
     elseif a == "--tlunpack" then opt.tlunpack = val()
     elseif a == "--mktexlsr" then opt.mktexlsr = val()
     elseif a == "--dry-run" then opt.dry = true
