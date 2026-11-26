@@ -42,42 +42,57 @@
              "Paper/Abschlussarbeit: dazu die empfohlenen und weiteren LaTeX-Pakete, "
              "TikZ/pgfplots, Mathematik/Informatik, BibTeX-Stile und die "
              "Standardschriften, ca. 190 MB. Das reicht für fast alle Arbeiten.\n\n"
-             "Alles: das vollständige TeX Live 2025 ohne Dokumentation, ca. 1,4 GB "
-             "und 175.000 Dateien.\n\n"
-             "Einzelne Pakete kann man später in der TeX-Shell nachinstallieren: "
-             "tlinst install <paket>")
+             "Alle Pakete: alles aus TeX Live 2025 außer fremden Sprachen und den "
+             "Zusatzschriften (die gibt es auf der nächsten Seite), ca. 550 MB.\n\n"
+             "Englisch ist immer dabei. Einzelne Pakete kann man später in der "
+             "TeX-Shell nachinstallieren: tlinst install <paket>")
         (cat "Minimal: LaTeX with the base packages, about 19 MB. Anything else can be added later.\n\n"
              "Paper/thesis: plus the recommended and additional LaTeX packages, "
              "TikZ/pgfplots, mathematics/computer science, BibTeX styles and the "
              "standard fonts, about 190 MB. Enough for almost any paper or thesis.\n\n"
-             "Everything: all of TeX Live 2025 without documentation, about 1.4 GB "
-             "and 175,000 files.\n\n"
-             "Single packages can be added later in the TeX-Shell: "
-             "tlinst install <package>")))
+             "All packages: everything of TeX Live 2025 except other languages and "
+             "the extra fonts (they are on the next page), about 550 MB.\n\n"
+             "English is always included. Single packages can be added later in "
+             "the TeX-Shell: tlinst install <package>")))
     (choices
       (if #de "Minimal (LaTeX), 19 MB" "Minimal (LaTeX), 19 MB")
       (if #de "Paper/Abschlussarbeit, 190 MB" "Paper/thesis, 190 MB")
-      (if #de "Alles, 1,4 GB" "Everything, 1.4 GB"))
+      (if #de "Alle Pakete, 550 MB" "All packages, 550 MB"))
     (default 0)))
 
 (set #langs
   (askoptions
-    (prompt (if #de "Sprachen und Schriften dazu:" "Languages and fonts in addition:"))
+    (prompt
+      (if #de
+        "Weitere Sprachen und Schriften (Englisch ist immer dabei):"
+        "More languages and fonts (English is always included):"))
     (help
       (if #de
-        (cat "Englisch ist immer dabei. Jede Sprache bringt Silbentrennung und "
-             "Babel-Unterstützung mit.\n\n"
-             "Bei \"Alles\" sind alle Sprachen und Schriften schon enthalten.")
-        (cat "English is always included. Each language brings hyphenation and "
-             "babel support.\n\n"
-             "\"Everything\" includes all languages and fonts already.")))
+        (cat "Jede Sprache bringt Silbentrennung, Babel-Unterstützung und ihre "
+             "Schriften mit. Die Größen gelten zusätzlich zu Paper/Abschlussarbeit; "
+             "mit \"Alle Pakete\" sind Kyrillisch, Griechisch und CJK kleiner, "
+             "weil sich die Schriften überschneiden.\n\n"
+             "Japanisch geht nur mit lualatex (luatexja); pLaTeX gibt es nicht.\n\n"
+             "Zusatzschriften: über 400 Schriftfamilien. Meist braucht man nur eine; "
+             "die lädt man besser einzeln in der TeX-Shell, z. B.: tlinst install iwona")
+        (cat "Each language brings hyphenation, babel support and its fonts. The "
+             "sizes are in addition to Paper/thesis; with \"All packages\" Cyrillic, "
+             "Greek and CJK are smaller, since the fonts overlap.\n\n"
+             "Japanese works with lualatex only (luatexja); there is no pLaTeX.\n\n"
+             "Extra fonts: more than 400 font families. Usually one of them is "
+             "needed; better load it alone in the TeX-Shell, e.g.: tlinst install iwona")))
     (choices
-      (if #de "Deutsch, 7 MB" "German, 7 MB")
-      (if #de "Weitere europäische Sprachen, 100 MB" "Other European languages, 100 MB")
-      (if #de "Arabisch, Hebräisch, Indisch u.a., 40 MB" "Arabic, Hebrew, Indic and others, 40 MB")
-      (if #de "Chinesisch, Japanisch, Koreanisch, 100 MB" "Chinese, Japanese, Korean, 100 MB")
-      (if #de "Zusatzschriften, 670 MB" "Extra fonts, 670 MB"))
-    (default 1)))
+      (if #de "Europäische Sprachen (lateinische Schrift, mit Deutsch), 11 MB"
+              "European languages (Latin script, with German), 11 MB")
+      (if #de "Kyrillisch, 68 MB" "Cyrillic, 68 MB")
+      (if #de "Griechisch, 66 MB" "Greek, 66 MB")
+      (if #de "Arabisch, Hebräisch, Indisch und weitere, 35 MB"
+              "Arabic, Hebrew, Indic and others, 35 MB")
+      (if #de "Chinesisch, 130 MB" "Chinese, 130 MB")
+      (if #de "Japanisch (nur lualatex), 144 MB" "Japanese (lualatex only), 144 MB")
+      (if #de "Koreanisch, 134 MB" "Korean, 134 MB")
+      (if #de "Zusatzschriften, 650 MB" "Extra fonts, 650 MB"))
+    (default 0)))
 
 (set #src
   (askchoice
@@ -126,16 +141,27 @@
     (cat "scheme-basic collection-latexrecommended collection-latexextra "
          "collection-pictures collection-fontsrecommended collection-bibtexextra "
          "collection-mathscience")))
-(if (= #scheme 2) (set #pkgs "scheme-full"))
-(if (IN #langs 0) (set #pkgs (cat #pkgs " collection-langgerman")))
-(if (IN #langs 1)
+; scheme-full without the languages and collection-fontsextra
+(if (= #scheme 2)
   (set #pkgs
-    (cat #pkgs " collection-langeuropean collection-langfrench collection-langitalian"
+    (cat "scheme-basic collection-langenglish collection-bibtexextra collection-binextra "
+         "collection-fontsrecommended collection-fontutils collection-formatsextra "
+         "collection-games collection-humanities collection-latexextra "
+         "collection-latexrecommended collection-luatex collection-mathscience "
+         "collection-metapost collection-music collection-pictures "
+         "collection-plaingeneric collection-pstricks collection-publishers")))
+(if (IN #langs 0)
+  (set #pkgs
+    (cat #pkgs " collection-langgerman collection-langfrench collection-langitalian"
          " collection-langspanish collection-langportuguese collection-langpolish"
-         " collection-langczechslovak collection-langcyrillic collection-langgreek")))
-(if (IN #langs 2) (set #pkgs (cat #pkgs " collection-langarabic collection-langother")))
-(if (IN #langs 3) (set #pkgs (cat #pkgs " collection-langcjk")))
-(if (IN #langs 4) (set #pkgs (cat #pkgs " collection-fontsextra")))
+         " collection-langczechslovak collection-langeuropean")))
+(if (IN #langs 1) (set #pkgs (cat #pkgs " collection-langcyrillic")))
+(if (IN #langs 2) (set #pkgs (cat #pkgs " collection-langgreek")))
+(if (IN #langs 3) (set #pkgs (cat #pkgs " collection-langarabic collection-langother")))
+(if (IN #langs 4) (set #pkgs (cat #pkgs " collection-langchinese")))
+(if (IN #langs 5) (set #pkgs (cat #pkgs " collection-langjapanese")))
+(if (IN #langs 6) (set #pkgs (cat #pkgs " collection-langkorean")))
+(if (IN #langs 7) (set #pkgs (cat #pkgs " collection-fontsextra")))
 
 (message
   (if #de

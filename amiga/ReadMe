@@ -5,16 +5,24 @@ DEUTSCH
 
 Installation
   Das Archiv irgendwo auspacken:
-    LhA x TeXLive-Amiga.lha Work:
+    LhA x TeXLive-Amiga-Core.lha Work:
   Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
   TeX-Pakete. Dann im Verzeichnis TeX "Install-Packages" doppelt
   anklicken und den Umfang wählen:
     Minimal (LaTeX)           19 MB Download,   ca. 100 MB auf der Platte
     Paper/Abschlussarbeit    190 MB Download,   ca. 600 MB
-    Alles                    1,4 GB Download,   ca. 4 GB, 175000 Dateien
-  dazu Sprachen und Zusatzschriften. Die Pakete kommen aus dem
-  eingefrorenen TeX Live 2025 (über HTTP aus dem Archiv der University of
-  Utah, oder aus einem Ordner, wenn man sie am PC heruntergeladen hat:
+    Alle Pakete              550 MB Download,   ca. 1,4 GB
+  Englisch ist immer dabei. Dazu kann man ankreuzen (Größe zusätzlich zu
+  Paper/Abschlussarbeit):
+    Europäische Sprachen (lateinische Schrift, mit Deutsch)   11 MB
+    Kyrillisch 68 MB, Griechisch 66 MB
+    Arabisch, Hebräisch, Indisch und weitere                  35 MB
+    Chinesisch 130 MB, Japanisch 144 MB (nur lualatex), Koreanisch 134 MB
+    Zusatzschriften (über 400 Schriftfamilien)               650 MB
+  Einzelne Schriften lädt man besser gezielt in der TeX-Shell, z. B.
+  "tlinst install iwona". Die Pakete kommen aus dem eingefrorenen
+  TeX Live 2025 (über HTTP aus dem Archiv der University of Utah, oder
+  aus einem Ordner, wenn man sie am PC heruntergeladen hat:
   .../texlive/2025/tlnet-final). Danach werden die Formate und die
   Schriftenliste für lualatex gebaut. Es wird nichts ins System kopiert.
 
@@ -56,7 +64,8 @@ Enthalten
 
   Nicht enthalten sind Programme, die nicht portiert sind: biber (ein
   Perl-Programm; biblatex mit backend=bibtex verwenden), XeTeX, ConTeXt,
-  Metafont, MetaPost, dvips, upTeX/pTeX. Ihre Pakete lässt der
+  Metafont, MetaPost, dvips, upTeX/pTeX (also kein pLaTeX; Japanisch geht
+  mit lualatex). Ihre Pakete lässt der
   Installer weg.
 
   Der erste Gebrauch einer Schrift in lualatex dauert etwas länger
@@ -144,18 +153,26 @@ ENGLISH
 
 Installation
   Unpack the archive anywhere:
-    LhA x TeXLive-Amiga.lha Work:
+    LhA x TeXLive-Amiga-Core.lha Work:
   This creates the drawer "TeX" with the programs, but no TeX packages
   yet. Then double-click "Install-Packages" in the TeX drawer and choose
   what to install:
     Minimal (LaTeX)           19 MB download,   about 100 MB on disk
     Paper/thesis             190 MB download,   about 600 MB
-    Everything               1.4 GB download,   about 4 GB, 175000 files
-  plus languages and extra fonts. The packages come from the frozen
-  TeX Live 2025 (over HTTP from the archive of the University of Utah, or
-  from a directory if you downloaded them on a PC:
-  .../texlive/2025/tlnet-final). Then the formats and lualatex's font
-  list are built. Nothing is copied into the system.
+    All packages             550 MB download,   about 1.4 GB
+  English is always included. In addition you can tick (sizes on top of
+  Paper/thesis):
+    European languages (Latin script, with German)            11 MB
+    Cyrillic 68 MB, Greek 66 MB
+    Arabic, Hebrew, Indic and others                          35 MB
+    Chinese 130 MB, Japanese 144 MB (lualatex only), Korean 134 MB
+    Extra fonts (more than 400 font families)                650 MB
+  Single fonts are better loaded on their own in the TeX-Shell, e.g.
+  "tlinst install iwona". The packages come from the frozen TeX Live 2025
+  (over HTTP from the archive of the University of Utah, or from a
+  directory if you downloaded them on a PC: .../texlive/2025/tlnet-final).
+  Then the formats and lualatex's font list are built. Nothing is copied
+  into the system.
 
   If something breaks off (network, disk full), just start
   Install-Packages again: packages that are done are not loaded again.
@@ -195,7 +212,8 @@ Included
 
   Not included are the programs that are not ported: biber (a Perl
   program; use biblatex with backend=bibtex), XeTeX, ConTeXt, Metafont,
-  MetaPost, dvips, upTeX/pTeX. The installer leaves their packages out.
+  MetaPost, dvips, upTeX/pTeX (so no pLaTeX; Japanese works with
+  lualatex). The installer leaves their packages out.
 
   The first use of a font in lualatex takes longer (it builds a cache in
   TeX/texmf-var).

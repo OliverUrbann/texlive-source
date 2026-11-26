@@ -31,6 +31,15 @@ EXCLUDE = {
     "collection-texworks", "texworks",
     "collection-wintools",
     "asymptote", "biber", "biber-ms", "xindy", "tlshell",
+    # pTeX/upTeX (Japanese engines, not ported) and what only they use;
+    # Japanese works with LuaLaTeX (luatexja)
+    "ptex", "uptex", "eptex", "euptex", "platex", "uplatex",
+    "ptex-base", "uptex-base", "ptex-fonts", "uptex-fonts", "ptex-fontmaps",
+    "platex-tools", "plautopatch", "ptex2pdf", "pbibtex-base", "japanese-otf",
+    "jsclasses", "morisawa", "pxbase", "pxchfon", "pxcjkcat", "pxjahyper",
+    "pxjodel", "pxrubrica", "pxufont", "ptex-manual", "pbibtex-manual",
+    "platexcheat", "mendex-doc", "texlive-ja", "lshort-japanese",
+    "zxjafbfont", "zxjatype",
 }
 
 
@@ -88,6 +97,12 @@ def main():
         if p["sum"]:
             out.write("s %d %s\n" % (p["size"], p["sum"]))
         deps = [d for d in p["dep"] if d in kept]
+        # a single package that needs a whole collection (yb-book needs all
+        # of collection-fontsextra, 650 MB) would make the choices of the
+        # installer useless: only collections and schemes keep such
+        # dependencies
+        if p["cat"] not in ("Collection", "Scheme"):
+            deps = [d for d in deps if pkgs[d]["cat"] not in ("Collection", "Scheme")]
         if deps:
             out.write("d %s\n" % " ".join(deps))
         for e in p["exe"]:

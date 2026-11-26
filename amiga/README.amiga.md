@@ -103,7 +103,10 @@ HTTP/1.0 requests; luasocket uses HTTP/1.1.)
 - `amiga/tlinst/mkindex.py` turns `texlive.tlpdb` (20 MB) into
   `tlpkg/tlinst.idx` (1 MB): names, categories, dependencies, container
   sizes and checksums, `execute` lines, short descriptions. Left out:
-  platform packages, and the engines that are not ported (`EXCLUDE`).
+  platform packages, and the engines that are not ported (`EXCLUDE`,
+  including pTeX/upTeX and what only they use). Dependencies of single
+  packages on whole collections are dropped (`yb-book` would otherwise
+  pull in all of `collection-fontsextra`).
 - `amiga/tlinst/tlinst.lua` (texlua; `tlnet.lua` does the HTTP part)
   resolves dependencies, downloads `archive/<name>.tar.xz` (or takes it
   from a local copy of `tlnet-final`), unpacks it with `tlunpack`, and
