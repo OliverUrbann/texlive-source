@@ -1,0 +1,163 @@
+Short:        TeX Live 2025: LaTeX, pdfTeX, LuaTeX
+Author:       TeX Live team, Amiga port by Oliver Urbann
+Uploader:     Oliver Urbann <EMAIL>
+Type:         text/tex
+Version:      2025.1
+Architecture: m68k-amigaos >= 3.0
+Distribution: Aminet
+Kurz:         TeX Live 2025: LaTeX, pdfTeX, LuaTeX
+Requires:     68020+, 64 MB RAM (128 MB for LuaLaTeX)
+
+=========================================================================
+ English
+=========================================================================
+
+TeX Live is the standard TeX distribution: the typesetting system TeX
+with LaTeX, the programs around it and thousands of packages and fonts.
+It is what papers, theses and books are written with at universities and
+publishers. This is TeX Live 2025 for classic AmigaOS 3.x, ported from
+the original sources.
+
+This archive is a minimal installation: the programs and a basic LaTeX
+(TeX Live's "scheme-basic"), enough to typeset LaTeX documents right
+away. Everything else of TeX Live 2025 can be installed with the
+included installer, in the usual ways:
+
+  - single packages over the internet, as with TeX Live on other
+    systems ("tlinst install <package>" in the TeX-Shell; over HTTP from
+    TeX Live's archive, a TCP/IP stack is needed);
+  - much faster for many packages at once: package bundles from the
+    release page of the port on GitHub, installed with Install-Packages:
+
+      https://github.com/OliverUrbann/texlive-source/releases
+
+    Paper (for papers and theses: the recommended and additional LaTeX
+    packages, TikZ/pgfplots, mathematics, BibTeX styles, standard fonts,
+    189 MB), AllPackages (547 MB), languages (European with German,
+    Cyrillic, Greek, Arabic/Hebrew/Indic, Chinese, Japanese, Korean) and
+    fonts (popular fonts, all extra fonts).
+
+Programs
+  pdflatex, pdftex, lualatex (LuaHBTeX: Unicode, OpenType fonts, all
+  languages TeX Live knows), tex, bibtex, makeindex, kpsewhich, mktexlsr,
+  texlua; the installer tlinst and Install-Packages.
+
+Requirements
+  68020 or better (68030+ recommended, a Vampire or an emulator with JIT
+  is comfortable), AmigaOS 3.0 or later.
+  Memory: about 56 MB free for pdflatex, 128 MB for lualatex, 256 MB for
+  Chinese/Japanese/Korean or several scripts in one document.
+  Disk: about 110 MB for this archive unpacked; Paper adds about 600 MB.
+  ixemul.library 80.1 is included (in TeX/Libs; nothing is copied into
+  the system).
+  A TCP/IP stack (Miami, Roadshow, AmiTCP) only for installing single
+  packages over the internet.
+
+Installation
+  1. Unpack anywhere:  LhA x TeXLive2025.lha Work:
+  2. Double-click "TeX-Shell" in the new drawer TeX. The first start
+     builds the formats (a few minutes). Then try:
+       cd TeX:examples
+       pdflatex hello
+  3. For more: put package bundles from GitHub in a directory and
+     double-click "Install-Packages", or "tlinst install <package>".
+  Details, also on fonts, languages and memory: TeX/ReadMe.
+
+Not included
+  XeTeX, ConTeXt, Metafont, MetaPost, dvips, pTeX (no PostScript output,
+  no pLaTeX; Japanese works with lualatex), biber (biblatex works with
+  backend=bibtex), latexmk and other Perl scripts.
+
+Source and license
+  TeX Live is free software under various free licenses (see the TeX
+  Live documentation). The port, with all changes and build scripts, is
+  in the branch "amiga" of
+    https://github.com/OliverUrbann/texlive-source
+  ixemul.library is free software from Aminet (dev/gcc). tlunpack uses XZ
+  Embedded (public domain).
+  Bugs and suggestions: on GitHub (Issues).
+
+History
+  2025.1 (28.11.2026)  first release on Aminet. TeX Live 2025 (pdfTeX
+                       1.40.28, LuaHBTeX 1.23.3); package installer and
+                       bundles instead of one archive of several GB;
+                       network in LuaTeX; os.execute and \write18 work.
+
+=========================================================================
+ Deutsch
+=========================================================================
+
+TeX Live ist die Standard-Distribution von TeX: das Satzsystem TeX mit
+LaTeX, den Programmen drumherum und Tausenden Paketen und Schriften.
+Damit werden an Universitaeten und in Verlagen Paper, Abschlussarbeiten
+und Buecher geschrieben. Dies ist TeX Live 2025 fuer das klassische
+AmigaOS 3.x, aus den Originalquellen portiert.
+
+Dieses Archiv ist eine minimale Installation: die Programme und ein
+grundlegendes LaTeX (TeX Live "scheme-basic"), genug, um sofort
+LaTeX-Dokumente zu uebersetzen. Alles Weitere von TeX Live 2025 laesst
+sich mit dem mitgelieferten Installer auf den ueblichen Wegen
+installieren:
+
+  - einzelne Pakete ueber das Internet, wie bei TeX Live auf anderen
+    Systemen ("tlinst install <paket>" in der TeX-Shell; per HTTP aus
+    dem Archiv von TeX Live, ein TCP/IP-Stack wird gebraucht);
+  - fuer viele Pakete auf einmal viel schneller: Paketbuendel von der
+    Release-Seite des Ports auf GitHub, installiert mit Install-Packages:
+
+      https://github.com/OliverUrbann/texlive-source/releases
+
+    Paper (fuer Paper und Abschlussarbeiten: die empfohlenen und weiteren
+    LaTeX-Pakete, TikZ/pgfplots, Mathematik, BibTeX-Stile,
+    Standardschriften, 189 MB), AllPackages (547 MB), Sprachen
+    (europaeisch mit Deutsch, Kyrillisch, Griechisch, Arabisch/Hebraeisch/
+    Indisch, Chinesisch, Japanisch, Koreanisch) und Schriften (beliebte
+    Schriften, alle Zusatzschriften).
+
+Programme
+  pdflatex, pdftex, lualatex (LuaHBTeX: Unicode, OpenType-Schriften, alle
+  Sprachen, die TeX Live kennt), tex, bibtex, makeindex, kpsewhich,
+  mktexlsr, texlua; der Installer tlinst und Install-Packages.
+
+Voraussetzungen
+  68020 oder besser (68030+ empfohlen, angenehm mit Vampire oder einem
+  Emulator mit JIT), AmigaOS 3.0 oder neuer.
+  Speicher: etwa 56 MB frei fuer pdflatex, 128 MB fuer lualatex, 256 MB
+  fuer Chinesisch/Japanisch/Koreanisch oder mehrere Schriftsysteme in
+  einem Dokument.
+  Platte: etwa 110 MB fuer dieses Archiv ausgepackt; Paper braucht etwa
+  600 MB mehr.
+  ixemul.library 80.1 liegt bei (in TeX/Libs; es wird nichts ins System
+  kopiert).
+  Ein TCP/IP-Stack (Miami, Roadshow, AmiTCP) nur zum Installieren
+  einzelner Pakete ueber das Internet.
+
+Installation
+  1. Irgendwo auspacken:  LhA x TeXLive2025.lha Work:
+  2. Im neuen Verzeichnis TeX "TeX-Shell" doppelt anklicken. Beim ersten
+     Start werden die Formate gebaut (einige Minuten). Dann z. B.:
+       cd TeX:examples
+       pdflatex hello
+  3. Fuer mehr: Paketbuendel von GitHub in einen Ordner legen und
+     "Install-Packages" doppelt anklicken, oder "tlinst install <paket>".
+  Einzelheiten, auch zu Schriften, Sprachen und Speicher: TeX/ReadMe.
+
+Nicht enthalten
+  XeTeX, ConTeXt, Metafont, MetaPost, dvips, pTeX (keine
+  PostScript-Ausgabe, kein pLaTeX; Japanisch geht mit lualatex), biber
+  (biblatex geht mit backend=bibtex), latexmk und andere Perl-Skripte.
+
+Quellen und Lizenz
+  TeX Live ist freie Software unter verschiedenen freien Lizenzen (siehe
+  die Dokumentation von TeX Live). Der Port mit allen Aenderungen und
+  Build-Skripten liegt im Branch "amiga" von
+    https://github.com/OliverUrbann/texlive-source
+  ixemul.library ist freie Software aus dem Aminet (dev/gcc). tlunpack
+  benutzt XZ Embedded (Public Domain).
+  Fehler und Vorschlaege: auf GitHub (Issues).
+
+Aenderungen
+  2025.1 (28.11.2026)  erste Veroeffentlichung im Aminet. TeX Live 2025
+                       (pdfTeX 1.40.28, LuaHBTeX 1.23.3); Paket-Installer
+                       und Buendel statt eines Archivs von mehreren GB;
+                       Netzwerk in LuaTeX; os.execute und \write18 gehen.

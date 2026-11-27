@@ -5,13 +5,18 @@ DEUTSCH
 
 Installation
   1. Das Archiv irgendwo auspacken:
-       LhA x TeXLive-Amiga-Core.lha Work:
-     Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
-     TeX-Pakete.
-  2. Die Paketbündel herunterladen, die man braucht (z. B. am PC), von
+       LhA x TeXLive2025.lha Work:
+     Es entsteht das Verzeichnis "TeX" mit den Programmen und einem
+     minimalen LaTeX (TeX Live "scheme-basic"). Im Verzeichnis TeX
+     "TeX-Shell" doppelt anklicken: Beim ersten Start werden die Formate
+     gebaut (einige Minuten), danach geht z. B.
+       cd TeX:examples
+       pdflatex hello
+  2. Für mehr Pakete die Paketbündel herunterladen, die man braucht
+     (z. B. am PC), von
        https://github.com/OliverUrbann/texlive-source/releases
-     Eins von Minimal, Paper oder AllPackages, dazu nach Bedarf Sprachen
-     und Schriften:
+     Minimal ist schon enthalten; für Paper und Abschlussarbeiten Paper,
+     für alles AllPackages, dazu nach Bedarf Sprachen und Schriften:
        TeXLive2025-Minimal.tar.xz       18 MB  LaTeX mit den Grundpaketen
        TeXLive2025-Paper.tar.xz        189 MB  für Paper/Abschlussarbeiten:
              empfohlene und weitere LaTeX-Pakete, TikZ/pgfplots,
@@ -169,13 +174,18 @@ ENGLISH
 
 Installation
   1. Unpack the archive anywhere:
-       LhA x TeXLive-Amiga-Core.lha Work:
-     This creates the drawer "TeX" with the programs, but no TeX packages
-     yet.
-  2. Download the package bundles you need (e.g. on a PC) from
+       LhA x TeXLive2025.lha Work:
+     This creates the drawer "TeX" with the programs and a minimal LaTeX
+     (TeX Live's "scheme-basic"). Double-click "TeX-Shell" in the TeX
+     drawer: the first start builds the formats (a few minutes), then
+     e.g.
+       cd TeX:examples
+       pdflatex hello
+  2. For more packages, download the package bundles you need (e.g. on
+     a PC) from
        https://github.com/OliverUrbann/texlive-source/releases
-     One of Minimal, Paper or AllPackages, plus languages and fonts as
-     needed:
+     Minimal is included already; for papers and theses take Paper, for
+     everything AllPackages, plus languages and fonts as needed:
        TeXLive2025-Minimal.tar.xz       18 MB  LaTeX with the base packages
        TeXLive2025-Paper.tar.xz        189 MB  for papers and theses:
              recommended and additional LaTeX packages, TikZ/pgfplots,

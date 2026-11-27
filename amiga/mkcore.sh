@@ -70,6 +70,8 @@ if [ $# -gt 0 ]; then
 	rm -rf "$pkg/tlpkg/download"
 fi
 
+cp "$src/amiga/TeXLive2025.readme" "$pkg/" 2>/dev/null || true
+
 echo "== ls-R"
 for d in texmf-dist texmf-local texmf-var; do
 	(cd "$pkg/$d" && { echo '% ls-R -- filename database for kpathsea; do not change this line.'; echo; LC_ALL=C ls -R ./ ; } > ls-R)
