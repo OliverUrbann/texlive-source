@@ -6,9 +6,9 @@ code is laid out so they can be added (see "Other Amiga systems").
 
 A ready package is on the
 [releases page](https://github.com/OliverUrbann/texlive-source/releases):
-the programs and a package installer (about 6 MB). Unpack it anywhere,
-double-click `Install-Packages` to load the TeX Live packages you want,
-then `TeX-Shell`. Its `ReadMe` (German and English) explains the use;
+the programs and a package installer (about 6 MB), and package bundles
+(`TeXLive2025-*.tar.xz`). Unpack the core anywhere, put the bundles you
+want in a directory, double-click `Install-Packages`, then `TeX-Shell`. Its `ReadMe` (German and English) explains the use;
 this file is about the port itself.
 
 ## Programs
@@ -121,7 +121,23 @@ HTTP/1.0 requests; luasocket uses HTTP/1.1.)
   in `amiga/tlinst/xz`) and tar, all streamed, so memory does not depend
   on the size of a package. Also builds for the host
   (`build-tlunpack.sh`).
-- `amiga/Install-Packages`: the Workbench front end, an Installer script.
+- Package bundles: installing thousands of packages one by one takes
+  long on an Amiga (1–2 s each on a Vampire, mostly connection and
+  program start per package). `amiga/mkbundles.sh` therefore installs the
+  groups of `amiga/tlinst/bundles.cfg` with `tlinst` on the host and packs
+  each into one `TeXLive2025-<name>.tar.xz` (xz -6: the Amiga needs the
+  8 MB dictionary), with the file lists and a package list
+  (`tlpkg/bundles/<name>.dat`). Minimal, Paper and AllPackages are
+  complete; the languages and fonts hold only what Minimal does not.
+  `tlinst bundle <file>...` unpacks them in one `tlunpack` run each and
+  then configures. They go on the GitHub release page; GitHub serves
+  only HTTPS, which texlua on AmigaOS 3 cannot do, so they are
+  downloaded beforehand, e.g. on a PC.
+- `amiga/Install-Packages`: the Workbench front end, an Installer script:
+  bundles from a directory (those present are ticked), or single
+  packages over the network. The package list goes to `tlinst` in a file
+  (`--list`), because AmigaDOS refuses command lines of more than about
+  500 characters.
 - `amiga/mkcore.sh` puts the drawer together, optionally with packages
   already in it (installed with `tlinst` on the host; the formats are
   then built at the first start of the TeX-Shell).

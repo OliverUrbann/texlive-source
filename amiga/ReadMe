@@ -4,29 +4,43 @@ TeX Live für AmigaOS 3 / TeX Live for AmigaOS 3
 DEUTSCH
 
 Installation
-  Das Archiv irgendwo auspacken:
-    LhA x TeXLive-Amiga-Core.lha Work:
-  Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
-  TeX-Pakete. Dann im Verzeichnis TeX "Install-Packages" doppelt
-  anklicken und den Umfang wählen:
-    Minimal (LaTeX)           19 MB Download,   ca. 100 MB auf der Platte
-    Paper/Abschlussarbeit    190 MB Download,   ca. 600 MB
-    Alle Pakete              550 MB Download,   ca. 1,4 GB
-  Englisch ist immer dabei. Dazu kann man ankreuzen (Größe zusätzlich zu
-  Paper/Abschlussarbeit):
-    Europäische Sprachen (lateinische Schrift, mit Deutsch)   11 MB
-    Kyrillisch 68 MB, Griechisch 66 MB
-    Arabisch, Hebräisch, Indisch und weitere                  35 MB
-    Chinesisch 130 MB, Japanisch 144 MB (nur lualatex), Koreanisch 134 MB
-    Beliebte Schriften (newtx, Libertinus, STIX2, Source Pro,
-      Inconsolata, EB Garamond, kpfonts, MLModern, Iwona)      53 MB
-    Alle Zusatzschriften (über 400 Schriftfamilien)          650 MB
-  Einzelne Schriften lädt man besser gezielt in der TeX-Shell, z. B.
-  "tlinst install iwona". Die Pakete kommen aus dem eingefrorenen
-  TeX Live 2025 (über HTTP aus dem Archiv der University of Utah, oder
-  aus einem Ordner, wenn man sie am PC heruntergeladen hat:
-  .../texlive/2025/tlnet-final). Danach werden die Formate und die
-  Schriftenliste für lualatex gebaut. Es wird nichts ins System kopiert.
+  1. Das Archiv irgendwo auspacken:
+       LhA x TeXLive-Amiga-Core.lha Work:
+     Es entsteht das Verzeichnis "TeX" mit den Programmen, aber noch ohne
+     TeX-Pakete.
+  2. Die Paketbündel herunterladen, die man braucht (z. B. am PC), von
+       https://github.com/OliverUrbann/texlive-source/releases
+     Eins von Minimal, Paper oder AllPackages, dazu nach Bedarf Sprachen
+     und Schriften:
+       TeXLive2025-Minimal.tar.xz       18 MB  LaTeX mit den Grundpaketen
+       TeXLive2025-Paper.tar.xz        189 MB  für Paper/Abschlussarbeiten:
+             empfohlene und weitere LaTeX-Pakete, TikZ/pgfplots,
+             Mathematik/Informatik, BibTeX-Stile, Standardschriften
+       TeXLive2025-AllPackages.tar.xz  547 MB  alles außer fremden
+             Sprachen und den Zusatzschriften
+       TeXLive2025-European.tar.xz      11 MB  europäische Sprachen mit
+             lateinischer Schrift, mit Deutsch
+       ...-Cyrillic 67 MB, ...-Greek 65 MB, ...-ArabicIndic 34 MB
+             (Arabisch, Hebräisch, Indisch u. a.), ...-Chinese 133 MB,
+             ...-Japanese 156 MB (nur lualatex), ...-Korean 138 MB
+       TeXLive2025-PopularFonts.tar.xz  52 MB  newtx, Libertinus, STIX2,
+             Source Pro, Inconsolata, EB Garamond, kpfonts, MLModern,
+             Iwona, FontAwesome
+       TeXLive2025-AllFonts.tar.xz     676 MB  alle Zusatzschriften
+     Englisch ist immer dabei.
+  3. Die Bündel in einen Ordner legen (z. B. in den TeX-Ordner), im
+     TeX-Ordner "Install-Packages" doppelt anklicken, "Paketbündel"
+     wählen und den Ordner angeben. Die vorhandenen Bündel sind
+     angekreuzt. Sie werden ausgepackt, danach werden die Formate und
+     die Schriftenliste für lualatex gebaut. Die Bündel kann man danach
+     löschen. Es wird nichts ins System kopiert.
+
+  Alle Bündel stammen aus dem eingefrorenen TeX Live 2025, passend zu
+  den Programmen. Ohne Bündel geht es auch: Install-Packages kann die
+  Pakete einzeln aus dem Internet laden (über HTTP aus dem Archiv der
+  University of Utah). Das sind aber Tausende, und das dauert sehr lange.
+  Für einzelne Pakete ist es der richtige Weg: "tlinst install <paket>"
+  in der TeX-Shell.
 
   Bricht etwas ab (Netz, Platte voll), Install-Packages einfach noch
   einmal starten: fertige Pakete werden nicht noch einmal geladen.
@@ -154,29 +168,43 @@ Mehr: TeX/README.amiga.md. Quelltext und Build-Skripte:
 ENGLISH
 
 Installation
-  Unpack the archive anywhere:
-    LhA x TeXLive-Amiga-Core.lha Work:
-  This creates the drawer "TeX" with the programs, but no TeX packages
-  yet. Then double-click "Install-Packages" in the TeX drawer and choose
-  what to install:
-    Minimal (LaTeX)           19 MB download,   about 100 MB on disk
-    Paper/thesis             190 MB download,   about 600 MB
-    All packages             550 MB download,   about 1.4 GB
-  English is always included. In addition you can tick (sizes on top of
-  Paper/thesis):
-    European languages (Latin script, with German)            11 MB
-    Cyrillic 68 MB, Greek 66 MB
-    Arabic, Hebrew, Indic and others                          35 MB
-    Chinese 130 MB, Japanese 144 MB (lualatex only), Korean 134 MB
-    Popular fonts (newtx, Libertinus, STIX2, Source Pro,
-      Inconsolata, EB Garamond, kpfonts, MLModern, Iwona)      53 MB
-    All extra fonts (more than 400 font families)            650 MB
-  Single fonts are better loaded on their own in the TeX-Shell, e.g.
-  "tlinst install iwona". The packages come from the frozen TeX Live 2025
-  (over HTTP from the archive of the University of Utah, or from a
-  directory if you downloaded them on a PC: .../texlive/2025/tlnet-final).
-  Then the formats and lualatex's font list are built. Nothing is copied
-  into the system.
+  1. Unpack the archive anywhere:
+       LhA x TeXLive-Amiga-Core.lha Work:
+     This creates the drawer "TeX" with the programs, but no TeX packages
+     yet.
+  2. Download the package bundles you need (e.g. on a PC) from
+       https://github.com/OliverUrbann/texlive-source/releases
+     One of Minimal, Paper or AllPackages, plus languages and fonts as
+     needed:
+       TeXLive2025-Minimal.tar.xz       18 MB  LaTeX with the base packages
+       TeXLive2025-Paper.tar.xz        189 MB  for papers and theses:
+             recommended and additional LaTeX packages, TikZ/pgfplots,
+             mathematics/computer science, BibTeX styles, standard fonts
+       TeXLive2025-AllPackages.tar.xz  547 MB  everything except other
+             languages and the extra fonts
+       TeXLive2025-European.tar.xz      11 MB  European languages in Latin
+             script, with German
+       ...-Cyrillic 67 MB, ...-Greek 65 MB, ...-ArabicIndic 34 MB
+             (Arabic, Hebrew, Indic and others), ...-Chinese 133 MB,
+             ...-Japanese 156 MB (lualatex only), ...-Korean 138 MB
+       TeXLive2025-PopularFonts.tar.xz  52 MB  newtx, Libertinus, STIX2,
+             Source Pro, Inconsolata, EB Garamond, kpfonts, MLModern,
+             Iwona, FontAwesome
+       TeXLive2025-AllFonts.tar.xz     676 MB  all extra fonts
+     English is always included.
+  3. Put the bundles in a directory (e.g. the TeX drawer), double-click
+     "Install-Packages" in the TeX drawer, choose "package bundles" and
+     give the directory. The bundles present are ticked. They are
+     unpacked, then the formats and lualatex's font list are built.
+     Afterwards the bundles can be deleted. Nothing is copied into the
+     system.
+
+  All bundles come from the frozen TeX Live 2025, matching the programs.
+  It also works without bundles: Install-Packages can load the packages
+  one by one from the internet (over HTTP from the archive of the
+  University of Utah). But there are thousands of them, and that takes
+  very long. For single packages it is the right way: "tlinst install
+  <package>" in the TeX-Shell.
 
   If something breaks off (network, disk full), just start
   Install-Packages again: packages that are done are not loaded again.

@@ -9,6 +9,9 @@
 --   list [what]         what: installed (default), schemes, collections,
 --                       all
 --   info <name>...      show a package and what it would bring along
+--   bundle <file>...    unpack package bundles (TeXLive2025-*.tar.xz, made
+--                       by mkbundles.sh) and configure: much faster than
+--                       installing thousands of packages one by one
 --   config              make the configuration again (font maps, hyphenation,
 --                       file name database, formats, font list)
 --
@@ -22,9 +25,10 @@
 --   --keep              keep downloaded containers (in tlpkg/download)
 --   --no-formats        do not build formats
 --   --no-fontlist       do not update LuaLaTeX's font list
---   --list FILE         read more names from FILE (separated by spaces or
---                       lines): AmigaDOS command lines are limited to
---                       about 500 characters
+--   --no-config         no configuration at all (for building bundles)
+--   --list FILE         read more names from FILE, one per line (for
+--                       install also several on a line): AmigaDOS command
+--                       lines are limited to about 500 characters
 --   --tlunpack PROG     the tlunpack program (default: in bin/m68k-amigaos)
 --   --mktexlsr PROG     the mktexlsr program (default: in bin/m68k-amigaos;
 --                       "lua" uses the slower built-in version)
@@ -114,10 +118,7 @@ do
     if a == "--root" then opt.root = val()
     elseif a == "--repository" then opt.repo = val()
     elseif a == "--proxy" then opt.proxy = val()
-    elseif a == "--list" then
-      local f = io.open(val(), "r") or die("cannot read " .. arg[i])
-      for n in f:read("a"):gmatch("%S+") do names[#names + 1] = n end
-      f:close()
+    elseif a == "--list" then opt.list = val()
     elseif a == "--tlunpack" then opt.tlunpack = val()
     elseif a == "--mktexlsr" then opt.mktexlsr = val()
     elseif a == "--dry-run" then opt.dry = true
@@ -125,6 +126,7 @@ do
     elseif a == "--verbose" then opt.verbose = true
     elseif a == "--no-formats" then opt.formats = false
     elseif a == "--no-fontlist" then opt.fontlist = false
+    elseif a == "--no-config" then opt.noconfig = true
     elseif a == "--version" then say("tlinst ", VERSION); os.exit(0)
     elseif a:sub(1, 2) == "--" then die("unknown option " .. a)
     elseif not cmd then cmd = a
@@ -132,8 +134,20 @@ do
     i = i + 1
   end
 end
+if opt.list then
+  local f = io.open(opt.list, "r") or die("cannot read " .. opt.list)
+  for l in f:lines() do
+    l = l:match("^%s*(.-)%s*$")
+    if cmd == "bundle" then                     -- file names may have spaces
+      if l ~= "" then names[#names + 1] = l end
+    else
+      for n in l:gmatch("%S+") do names[#names + 1] = n end
+    end
+  end
+  f:close()
+end
 if not cmd then
-  say("usage: tlinst [options] install|remove|list|info|config [names...]")
+  say("usage: tlinst [options] install|remove|bundle|list|info|config [names...]")
   say("see the comment at the top of tlinst.lua for the options")
   os.exit(10)
 end
@@ -177,15 +191,31 @@ do
 end
 opt.repo = opt.repo or defrepo
 
--- installed packages: tlpkg/installed.dat, "name sha512" per line
+-- installed packages: tlpkg/installed.dat ("name sha512" per line) for
+-- packages installed one by one, tlpkg/bundles/*.dat for those that came
+-- with a bundle
 local installed = {}
 local INSTDB = J(TLPKG, "installed.dat")
-do
-  for _, l in ipairs(readlines(INSTDB) or {}) do
-    local n, s = l:match("^(%S+)%s*(%S*)")
-    if n then installed[n] = s end
+local BUNDLES = J(TLPKG, "bundles")
+local function read_installed()
+  local t = {}
+  local files = {}
+  if isdir(BUNDLES) then
+    for e in lfs.dir(BUNDLES) do
+      if e:match("%.dat$") then files[#files + 1] = J(BUNDLES, e) end
+    end
+    table.sort(files)
   end
+  files[#files + 1] = INSTDB
+  for _, file in ipairs(files) do
+    for _, l in ipairs(readlines(file) or {}) do
+      local n, s = l:match("^(%S+)%s*(%S*)")
+      if n then t[n] = s end
+    end
+  end
+  return t
 end
+installed = read_installed()
 -- the whole list, sorted (at the end of a run)
 local function save_installed()
   local t = {}
@@ -353,11 +383,62 @@ local function remove(list)
         os.remove(listfile(n))
         installed[n] = nil
         note_changes(p, files)
+        -- take it out of the bundle lists too
+        if isdir(BUNDLES) then
+          for e in lfs.dir(BUNDLES) do
+            if e:match("%.dat$") then
+              local t, hit = {}, false
+              for _, l in ipairs(readlines(J(BUNDLES, e)) or {}) do
+                if l:match("^(%S+)") == n then hit = true else t[#t + 1] = l end
+              end
+              if hit then writefile(J(BUNDLES, e), table.concat(t, "\n") .. "\n") end
+            end
+          end
+        end
       end
       say("removed ", n, " (", #files, " files)")
     end
   end
   if not opt.dry then save_installed() end
+end
+
+-- unpack bundles: one tlunpack run per bundle; the bundle brings the file
+-- lists (tlpkg/lists) and its package list (tlpkg/bundles/<name>.dat)
+local function bundles(list)
+  local ok = true
+  for i, file in ipairs(list) do
+    if not exists(file) then
+      say("no file ", file); ok = false
+    else
+      say(string.format("[%d/%d] %s (%s), unpacking ...", i, #list, file,
+                        mb(lfs.attributes(file, "size") or 0)))
+      if opt.dry then
+        say("  (dry run)")
+      elseif run(quote(opt.tlunpack) .. " -p -d " .. quote(R) .. " " .. quote(file)) then
+        say("  ok")
+      else
+        say("  FAILED: damaged file or disk full")
+        ok = false
+      end
+    end
+  end
+  if opt.dry then return ok end
+  -- what came new, for the configuration
+  local before = installed
+  installed = read_installed()
+  for n, s in pairs(installed) do
+    if before[n] ~= s and idx[n] then
+      local p = idx[n]
+      local files = readlines(listfile(n)) or {}
+      if not p.reloc then
+        local t = {}
+        for _, f in ipairs(files) do t[#t + 1] = (f:gsub("^texmf%-dist/", "")) end
+        files = t
+      end
+      note_changes(p, files)
+    end
+  end
+  return ok
 end
 
 -- ---------------------------------------------------------------------
@@ -582,6 +663,7 @@ local function copy_programs()
 end
 
 local function configure(force)
+  if opt.noconfig then return end
   say("Configuring ...")
   copy_programs()
   if force or changed.formats then make_languages() end
@@ -648,6 +730,11 @@ if cmd == "install" then
   local ok = install(names)
   if not opt.dry and changed.any then configure(false) end
   if ok == false then os.exit(5) end
+elseif cmd == "bundle" then
+  if #names == 0 then die("which bundle files?") end
+  local ok = bundles(names)
+  if not opt.dry and changed.any then configure(false) end
+  if not ok then os.exit(5) end
 elseif cmd == "remove" then
   remove(names)
   if not opt.dry and changed.any then configure(false) end

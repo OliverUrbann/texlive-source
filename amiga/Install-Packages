@@ -1,9 +1,11 @@
 ; Install-Packages: Installer script of TeX Live for AmigaOS.
 ;
-; Started by its icon (default tool Installer) in the TeX drawer.  Asks
-; what to install and where from, then runs the package installer
-; (TeX:tlpkg/tlinst.lua, in texlua) in a Shell window that shows the
-; progress.  It only adds packages to this TeX drawer; nothing is copied
+; Started by its icon (default tool Installer) in the TeX drawer.  Two
+; ways: package bundles (TeXLive2025-*.tar.xz, from the GitHub release
+; page) in a directory, which is fast; or single packages from the
+; internet, slow because there are thousands.  Either way the package
+; installer (TeX:tlpkg/tlinst.lua, in texlua) does the work in a Shell
+; window that shows the progress.  It only adds packages to this TeX drawer; nothing is copied
 ; into the system.  Run it again to add more.  In the TeX-Shell the same
 ; works without this script, e.g.:  tlinst install collection-langfrench
 
@@ -30,176 +32,358 @@
 (makeassign "TeX" #root)
 (run "Execute TeX:S/TeX-Assigns" (safe))
 
-(set #scheme
+; ---- package bundles ---------------------------------------------------
+
+(procedure P_BUNDLES
+  (set #bdir
+    (askdir
+      (prompt
+        (if #de
+          "Ordner mit den Paketbündeln (TeXLive2025-...tar.xz):"
+          "Directory with the package bundles (TeXLive2025-...tar.xz):"))
+      (help
+        (if #de
+          (cat "Die Bündel gibt es auf der GitHub-Seite des Ports unter Releases:\n"
+               "https://github.com/OliverUrbann/texlive-source/releases\n\n"
+               "Man lädt nur die Bündel, die man braucht (z. B. am PC), und legt sie "
+               "in einen Ordner, gern in diesen TeX-Ordner. Nach dem Installieren "
+               "kann man sie löschen.")
+          (cat "The bundles are on the GitHub page of the port, under Releases:\n"
+               "https://github.com/OliverUrbann/texlive-source/releases\n\n"
+               "Download only the bundles you need (e.g. on a PC) and put them in a "
+               "directory, for example this TeX drawer. After installing, they can "
+               "be deleted.")))
+      (default #root)))
+
+  (set #b0 (= 1 (exists (tackon #bdir "TeXLive2025-Minimal.tar.xz"))))
+  (set #b1 (= 1 (exists (tackon #bdir "TeXLive2025-Paper.tar.xz"))))
+  (set #b2 (= 1 (exists (tackon #bdir "TeXLive2025-AllPackages.tar.xz"))))
+  (set #b3 (= 1 (exists (tackon #bdir "TeXLive2025-European.tar.xz"))))
+  (set #b4 (= 1 (exists (tackon #bdir "TeXLive2025-Cyrillic.tar.xz"))))
+  (set #b5 (= 1 (exists (tackon #bdir "TeXLive2025-Greek.tar.xz"))))
+  (set #b6 (= 1 (exists (tackon #bdir "TeXLive2025-ArabicIndic.tar.xz"))))
+  (set #b7 (= 1 (exists (tackon #bdir "TeXLive2025-Chinese.tar.xz"))))
+  (set #b8 (= 1 (exists (tackon #bdir "TeXLive2025-Japanese.tar.xz"))))
+  (set #b9 (= 1 (exists (tackon #bdir "TeXLive2025-Korean.tar.xz"))))
+  (set #b10 (= 1 (exists (tackon #bdir "TeXLive2025-PopularFonts.tar.xz"))))
+  (set #b11 (= 1 (exists (tackon #bdir "TeXLive2025-AllFonts.tar.xz"))))
+
+  (if (= 0 (+ #b0 #b1 #b2 #b3 #b4 #b5 #b6 #b7 #b8 #b9 #b10 #b11))
+    (abort
+      (if #de
+        (cat "In " #bdir " liegen keine Paketbündel (TeXLive2025-...tar.xz).\n\n"
+             "Die Bündel gibt es unter\n"
+             "https://github.com/OliverUrbann/texlive-source/releases\n"
+             "Mindestens eins von Minimal, Paper oder AllPackages herunterladen, "
+             "dazu nach Bedarf Sprachen und Schriften, in einen Ordner legen und "
+             "Install-Packages noch einmal starten.")
+        (cat "There are no package bundles (TeXLive2025-...tar.xz) in " #bdir ".\n\n"
+             "The bundles are at\n"
+             "https://github.com/OliverUrbann/texlive-source/releases\n"
+             "Download at least one of Minimal, Paper or AllPackages, plus languages "
+             "and fonts as needed, put them in a directory and start "
+             "Install-Packages again."))))
+
+  (set #miss (if #de " - fehlt" " - missing"))
+  (set #sel
+    (askoptions
+      (prompt
+        (if #de
+          "Welche Bündel installieren? (vorhandene sind angekreuzt)"
+          "Which bundles should be installed? (those present are ticked)"))
+      (help
+        (if #de
+          (cat "Minimal, Paper und Alle Pakete schließen einander ein: eins davon "
+               "genügt (Alle Pakete enthält Paper, Paper enthält Minimal). Die "
+               "Sprachen und Schriften passen zu jedem der drei.\n\n"
+               "Minimal: LaTeX mit den Grundpaketen.\n"
+               "Paper: dazu die empfohlenen und weiteren LaTeX-Pakete, TikZ/pgfplots, "
+               "Mathematik/Informatik, BibTeX-Stile, Standardschriften.\n"
+               "Alle Pakete: alles außer fremden Sprachen und den Zusatzschriften.\n\n"
+               "Englisch ist immer dabei. Japanisch geht nur mit lualatex. Beliebte "
+               "Schriften: newtx, Libertinus, STIX2, Source Pro, Inconsolata, EB "
+               "Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+               "Fehlt ein Bündel, kann man es auch später dazu installieren.")
+          (cat "Minimal, Paper and All packages include each other: one of them "
+               "is enough (All packages holds Paper, Paper holds Minimal). The "
+               "languages and fonts go with any of the three.\n\n"
+               "Minimal: LaTeX with the base packages.\n"
+               "Paper: plus the recommended and additional LaTeX packages, "
+               "TikZ/pgfplots, mathematics/computer science, BibTeX styles, standard fonts.\n"
+               "All packages: everything except other languages and the extra fonts.\n\n"
+               "English is always included. Japanese works with lualatex only. "
+               "Popular fonts: newtx, Libertinus, STIX2, Source Pro, Inconsolata, EB "
+               "Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+               "A bundle that is missing can be installed later as well.")))
+      (choices
+        (cat "Minimal (LaTeX), 18 MB" (if #b0 "" #miss))
+        (cat (if #de "Paper/Abschlussarbeit, 189 MB" "Paper/thesis, 189 MB") (if #b1 "" #miss))
+        (cat (if #de "Alle Pakete, 547 MB" "All packages, 547 MB") (if #b2 "" #miss))
+        (cat (if #de "Europäische Sprachen (mit Deutsch), 11 MB" "European languages (with German), 11 MB") (if #b3 "" #miss))
+        (cat (if #de "Kyrillisch, 67 MB" "Cyrillic, 67 MB") (if #b4 "" #miss))
+        (cat (if #de "Griechisch, 65 MB" "Greek, 65 MB") (if #b5 "" #miss))
+        (cat (if #de "Arabisch, Hebräisch, Indisch u.a., 34 MB" "Arabic, Hebrew, Indic and others, 34 MB") (if #b6 "" #miss))
+        (cat (if #de "Chinesisch, 133 MB" "Chinese, 133 MB") (if #b7 "" #miss))
+        (cat (if #de "Japanisch (nur lualatex), 156 MB" "Japanese (lualatex only), 156 MB") (if #b8 "" #miss))
+        (cat (if #de "Koreanisch, 138 MB" "Korean, 138 MB") (if #b9 "" #miss))
+        (cat (if #de "Beliebte Schriften, 52 MB" "Popular fonts, 52 MB") (if #b10 "" #miss))
+        (cat (if #de "Alle Zusatzschriften, 676 MB" "All extra fonts, 676 MB") (if #b11 "" #miss)))
+      (default
+        (+ (if #b0 1 0) (if #b1 2 0) (if #b2 4 0) (if #b3 8 0) (if #b4 16 0)
+           (if #b5 32 0) (if #b6 64 0) (if #b7 128 0) (if #b8 256 0)
+           (if #b9 512 0) (if #b10 1024 0) (if #b11 2048 0)))))
+
+  ; only what is there and ticked; of the three bases only the largest
+  (set #list "")
+  (set #base 0)
+  (if (AND (IN #sel 2) #b2)
+    (set #base 3)
+    (if (AND (IN #sel 1) #b1)
+      (set #base 2)
+      (if (AND (IN #sel 0) #b0) (set #base 1))))
+  (if (= #base 3) (set #list (cat (tackon #bdir "TeXLive2025-AllPackages.tar.xz") "\n")))
+  (if (= #base 2) (set #list (cat (tackon #bdir "TeXLive2025-Paper.tar.xz") "\n")))
+  (if (= #base 1) (set #list (cat (tackon #bdir "TeXLive2025-Minimal.tar.xz") "\n")))
+  (if (= #base 0)
+    (if (not (exists "TeX:texmf-dist/tex/latex/base/latex.ltx"))
+      (abort
+        (if #de
+          "Eins der Bündel Minimal, Paper oder Alle Pakete wird gebraucht (die Sprachen und Schriften bauen darauf auf)."
+          "One of the bundles Minimal, Paper or All packages is needed (the languages and fonts build on it)."))))
+  (if (AND (IN #sel 3) #b3) (set #list (cat #list (tackon #bdir "TeXLive2025-European.tar.xz") "\n")))
+  (if (AND (IN #sel 4) #b4) (set #list (cat #list (tackon #bdir "TeXLive2025-Cyrillic.tar.xz") "\n")))
+  (if (AND (IN #sel 5) #b5) (set #list (cat #list (tackon #bdir "TeXLive2025-Greek.tar.xz") "\n")))
+  (if (AND (IN #sel 6) #b6) (set #list (cat #list (tackon #bdir "TeXLive2025-ArabicIndic.tar.xz") "\n")))
+  (if (AND (IN #sel 7) #b7) (set #list (cat #list (tackon #bdir "TeXLive2025-Chinese.tar.xz") "\n")))
+  (if (AND (IN #sel 8) #b8) (set #list (cat #list (tackon #bdir "TeXLive2025-Japanese.tar.xz") "\n")))
+  (if (AND (IN #sel 9) #b9) (set #list (cat #list (tackon #bdir "TeXLive2025-Korean.tar.xz") "\n")))
+  (if (AND (IN #sel 10) #b10) (set #list (cat #list (tackon #bdir "TeXLive2025-PopularFonts.tar.xz") "\n")))
+  (if (AND (IN #sel 11) #b11) (set #list (cat #list (tackon #bdir "TeXLive2025-AllFonts.tar.xz") "\n")))
+  (if (= #list "")
+    (abort (if #de "Kein vorhandenes Bündel ausgewählt." "No bundle that is present was selected.")))
+
+  (message
+    (if #de
+      (cat "Jetzt werden die Bündel ausgepackt. Ein Fenster zeigt den Fortschritt.\n\n"
+           "Danach werden die Formate und die Schriftenliste für LuaLaTeX gebaut: "
+           "auf einem schnellen Amiga einige Minuten, auf einem 68030 deutlich länger.")
+      (cat "The bundles are unpacked now. A window shows the progress.\n\n"
+           "Afterwards the formats and LuaLaTeX's font list are built: a few minutes "
+           "on a fast Amiga, much longer on a 68030.")))
+
+  ; the list goes into a file: AmigaDOS takes no long command lines
+  (if (exists "T:TeX-Bundles") (delete "T:TeX-Bundles" (safe)))
+  (textfile
+    (dest "T:TeX-Bundles")
+    (append #list)
+    (safe))
+  (working (if #de "Packe TeX-Live-Bündel aus ..." "Unpacking TeX Live bundles ..."))
+  (set #rc
+    (run
+      (cat "TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua"
+           " --list T:TeX-Bundles bundle"
+           " >\"CON:0/20/640/220/TeX Live/AUTO/WAIT/CLOSE\""))))
+
+; ---- single packages from the internet ----------------------------------
+
+(procedure P_NET
+  (set #scheme
+    (askchoice
+      (prompt
+        (if #de
+          "Was soll installiert werden?\n(Größen: Download über das Netz)"
+          "What should be installed?\n(Sizes: download over the network)"))
+      (help
+        (if #de
+          (cat "Minimal: LaTeX mit den Grundpaketen, ca. 19 MB. Alles Weitere lässt sich später nachladen.\n\n"
+               "Paper/Abschlussarbeit: dazu die empfohlenen und weiteren LaTeX-Pakete, "
+               "TikZ/pgfplots, Mathematik/Informatik, BibTeX-Stile und die "
+               "Standardschriften, ca. 190 MB. Das reicht für fast alle Arbeiten.\n\n"
+               "Alle Pakete: alles aus TeX Live 2025 außer fremden Sprachen und den "
+               "Zusatzschriften (die gibt es auf der nächsten Seite), ca. 550 MB.\n\n"
+               "Englisch ist immer dabei. Einzelne Pakete kann man später in der "
+               "TeX-Shell nachinstallieren: tlinst install <paket>")
+          (cat "Minimal: LaTeX with the base packages, about 19 MB. Anything else can be added later.\n\n"
+               "Paper/thesis: plus the recommended and additional LaTeX packages, "
+               "TikZ/pgfplots, mathematics/computer science, BibTeX styles and the "
+               "standard fonts, about 190 MB. Enough for almost any paper or thesis.\n\n"
+               "All packages: everything of TeX Live 2025 except other languages and "
+               "the extra fonts (they are on the next page), about 550 MB.\n\n"
+               "English is always included. Single packages can be added later in "
+               "the TeX-Shell: tlinst install <package>")))
+      (choices
+        (if #de "Minimal (LaTeX), 19 MB" "Minimal (LaTeX), 19 MB")
+        (if #de "Paper/Abschlussarbeit, 190 MB" "Paper/thesis, 190 MB")
+        (if #de "Alle Pakete, 550 MB" "All packages, 550 MB"))
+      (default 0)))
+
+  (set #langs
+    (askoptions
+      (prompt
+        (if #de
+          "Weitere Sprachen und Schriften (Englisch ist immer dabei):"
+          "More languages and fonts (English is always included):"))
+      (help
+        (if #de
+          (cat "Jede Sprache bringt Silbentrennung, Babel-Unterstützung und ihre "
+               "Schriften mit. Die Größen gelten zusätzlich zu Paper/Abschlussarbeit; "
+               "mit \"Alle Pakete\" sind Kyrillisch, Griechisch und CJK kleiner, "
+               "weil sich die Schriften überschneiden.\n\n"
+               "Japanisch geht nur mit lualatex (luatexja); pLaTeX gibt es nicht.\n\n"
+               "Beliebte Schriften: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
+               "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+               "Alle Zusatzschriften: über 400 Schriftfamilien. Meist braucht man nur eine; "
+               "die lädt man besser einzeln in der TeX-Shell, z. B.: tlinst install noto")
+          (cat "Each language brings hyphenation, babel support and its fonts. The "
+               "sizes are in addition to Paper/thesis; with \"All packages\" Cyrillic, "
+               "Greek and CJK are smaller, since the fonts overlap.\n\n"
+               "Japanese works with lualatex only (luatexja); there is no pLaTeX.\n\n"
+               "Popular fonts: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
+               "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
+               "All extra fonts: more than 400 font families. Usually one of them is "
+               "needed; better load it alone in the TeX-Shell, e.g.: tlinst install noto")))
+      (choices
+        (if #de "Europäische Sprachen (lateinische Schrift, mit Deutsch), 11 MB"
+                "European languages (Latin script, with German), 11 MB")
+        (if #de "Kyrillisch, 68 MB" "Cyrillic, 68 MB")
+        (if #de "Griechisch, 66 MB" "Greek, 66 MB")
+        (if #de "Arabisch, Hebräisch, Indisch und weitere, 35 MB"
+                "Arabic, Hebrew, Indic and others, 35 MB")
+        (if #de "Chinesisch, 130 MB" "Chinese, 130 MB")
+        (if #de "Japanisch (nur lualatex), 144 MB" "Japanese (lualatex only), 144 MB")
+        (if #de "Koreanisch, 134 MB" "Korean, 134 MB")
+        (if #de "Beliebte Schriften (newtx, Libertinus, STIX2 u.a.), 53 MB"
+                "Popular fonts (newtx, Libertinus, STIX2 and others), 53 MB")
+        (if #de "Alle Zusatzschriften, 650 MB" "All extra fonts, 650 MB"))
+      (default 0)))
+
+  (set #src
+    (askchoice
+      (prompt (if #de "Woher sollen die Pakete kommen?" "Where should the packages come from?"))
+      (help
+        (if #de
+          (cat "Internet: der eingefrorene Stand von TeX Live 2025 im Archiv der "
+               "University of Utah, über HTTP (ein TCP/IP-Stack muss laufen).\n\n"
+               "Anderer Server: ein anderer Spiegel desselben Ordners "
+               "(.../texlive/2025/tlnet-final), nur http://.\n\n"
+               "Lokaler Ordner: eine Kopie von tlnet-final (mit dem Unterordner "
+               "archive), z. B. am PC heruntergeladen.")
+          (cat "Internet: the frozen TeX Live 2025 in the archive of the University "
+               "of Utah, over HTTP (a TCP/IP stack must be running).\n\n"
+               "Other server: another mirror of the same directory "
+               "(.../texlive/2025/tlnet-final), http:// only.\n\n"
+               "Local directory: a copy of tlnet-final (with its archive "
+               "subdirectory), e.g. downloaded on a PC.")))
+      (choices
+        "Internet: ftp.math.utah.edu"
+        (if #de "Anderer Server" "Other server")
+        (if #de "Lokaler Ordner" "Local directory"))
+      (default 0)))
+
+  (set #repo "")
+  (if (= #src 1)
+    (set #repo
+      (cat " --repository "
+        (askstring
+          (prompt (if #de "Adresse des Servers (tlnet-final von 2025):" "Server address (tlnet-final of 2025):"))
+          (help (if #de "Nur http://, kein https://." "Only http://, no https://."))
+          (default "http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final")))))
+  (if (= #src 2)
+    (set #repo
+      (cat " --repository \""
+        (askdir
+          (prompt (if #de "Ordner tlnet-final (mit archive darin):" "Directory tlnet-final (with archive in it):"))
+          (help (if #de "Der Ordner, in dem archive/ liegt." "The directory that holds archive/."))
+          (default "RAM:"))
+        "\"")))
+
+  (set #pkgs "")
+  (if (= #scheme 0) (set #pkgs "scheme-basic"))
+  (if (= #scheme 1)
+    (set #pkgs
+      (cat "scheme-basic collection-latexrecommended collection-latexextra "
+           "collection-pictures collection-fontsrecommended collection-bibtexextra "
+           "collection-mathscience")))
+  ; scheme-full without the languages and collection-fontsextra
+  (if (= #scheme 2)
+    (set #pkgs
+      (cat "scheme-basic collection-langenglish collection-bibtexextra collection-binextra "
+           "collection-fontsrecommended collection-fontutils collection-formatsextra "
+           "collection-games collection-humanities collection-latexextra "
+           "collection-latexrecommended collection-luatex collection-mathscience "
+           "collection-metapost collection-music collection-pictures "
+           "collection-plaingeneric collection-pstricks collection-publishers")))
+  (if (IN #langs 0)
+    (set #pkgs
+      (cat #pkgs " collection-langgerman collection-langfrench collection-langitalian"
+           " collection-langspanish collection-langportuguese collection-langpolish"
+           " collection-langczechslovak collection-langeuropean")))
+  (if (IN #langs 1) (set #pkgs (cat #pkgs " collection-langcyrillic")))
+  (if (IN #langs 2) (set #pkgs (cat #pkgs " collection-langgreek")))
+  (if (IN #langs 3) (set #pkgs (cat #pkgs " collection-langarabic collection-langother")))
+  (if (IN #langs 4) (set #pkgs (cat #pkgs " collection-langchinese")))
+  (if (IN #langs 5) (set #pkgs (cat #pkgs " collection-langjapanese")))
+  (if (IN #langs 6) (set #pkgs (cat #pkgs " collection-langkorean")))
+  (if (IN #langs 7)
+    (set #pkgs
+      (cat #pkgs " newtx newtxtt libertinus libertinus-type1 libertinus-otf"
+           " libertinus-fonts inconsolata sourcesanspro sourcecodepro sourceserifpro"
+           " stix2-otf stix2-type1 ebgaramond kpfonts mlmodern iwona fontawesome")))
+  (if (IN #langs 8) (set #pkgs (cat #pkgs " collection-fontsextra")))
+
+  (message
+    (if #de
+      (cat "Jetzt werden die Pakete installiert. Ein Fenster zeigt den Fortschritt.\n\n"
+           "Danach werden die Formate und die Schriftenliste für LuaLaTeX gebaut: "
+           "auf einem schnellen Amiga einige Minuten, auf einem 68030 deutlich länger.\n\n"
+           "Bricht etwas ab, das Skript einfach noch einmal starten: "
+           "Fertige Pakete werden nicht neu geladen.")
+      (cat "The packages are installed now. A window shows the progress.\n\n"
+           "Afterwards the formats and LuaLaTeX's font list are built: a few minutes "
+           "on a fast Amiga, much longer on a 68030.\n\n"
+           "If something breaks off, just start this script again: packages that are "
+           "done are not loaded again.")))
+
+  ; the list goes into a file: AmigaDOS takes no command lines of this length
+  (if (exists "T:TeX-Packages") (delete "T:TeX-Packages" (safe)))
+  (textfile
+    (dest "T:TeX-Packages")
+    (append #pkgs)
+    (safe))
+
+  (working (if #de "Installiere TeX-Live-Pakete ..." "Installing TeX Live packages ..."))
+  (set #rc
+    (run
+      (cat "TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua" #repo
+           " --list T:TeX-Packages install"
+           " >\"CON:0/20/640/220/TeX Live/AUTO/WAIT/CLOSE\"")))
+)
+
+; ---- which way -------------------------------------------------------------
+
+(set #how
   (askchoice
-    (prompt
-      (if #de
-        "Was soll installiert werden?\n(Größen: Download über das Netz)"
-        "What should be installed?\n(Sizes: download over the network)"))
+    (prompt (if #de "Wie sollen die Pakete installiert werden?" "How should the packages be installed?"))
     (help
       (if #de
-        (cat "Minimal: LaTeX mit den Grundpaketen, ca. 19 MB. Alles Weitere lässt sich später nachladen.\n\n"
-             "Paper/Abschlussarbeit: dazu die empfohlenen und weiteren LaTeX-Pakete, "
-             "TikZ/pgfplots, Mathematik/Informatik, BibTeX-Stile und die "
-             "Standardschriften, ca. 190 MB. Das reicht für fast alle Arbeiten.\n\n"
-             "Alle Pakete: alles aus TeX Live 2025 außer fremden Sprachen und den "
-             "Zusatzschriften (die gibt es auf der nächsten Seite), ca. 550 MB.\n\n"
-             "Englisch ist immer dabei. Einzelne Pakete kann man später in der "
-             "TeX-Shell nachinstallieren: tlinst install <paket>")
-        (cat "Minimal: LaTeX with the base packages, about 19 MB. Anything else can be added later.\n\n"
-             "Paper/thesis: plus the recommended and additional LaTeX packages, "
-             "TikZ/pgfplots, mathematics/computer science, BibTeX styles and the "
-             "standard fonts, about 190 MB. Enough for almost any paper or thesis.\n\n"
-             "All packages: everything of TeX Live 2025 except other languages and "
-             "the extra fonts (they are on the next page), about 550 MB.\n\n"
-             "English is always included. Single packages can be added later in "
-             "the TeX-Shell: tlinst install <package>")))
+        (cat "Paketbündel: wenige große Dateien (TeXLive2025-...tar.xz) von der "
+             "GitHub-Seite des Ports, die man vorher herunterlädt (z. B. am PC). "
+             "Das geht schnell.\n\n"
+             "Einzeln aus dem Internet: Der Amiga lädt jedes TeX-Live-Paket selbst, "
+             "über HTTP. Für einzelne Pakete gut, für eine ganze Installation "
+             "(Tausende Pakete) sehr langsam.")
+        (cat "Package bundles: a few big files (TeXLive2025-...tar.xz) from the "
+             "GitHub page of the port, downloaded beforehand (e.g. on a PC). "
+             "This is fast.\n\n"
+             "Single packages from the internet: the Amiga loads each TeX Live "
+             "package itself, over HTTP. Good for a few packages, very slow for a "
+             "whole installation (thousands of packages).")))
     (choices
-      (if #de "Minimal (LaTeX), 19 MB" "Minimal (LaTeX), 19 MB")
-      (if #de "Paper/Abschlussarbeit, 190 MB" "Paper/thesis, 190 MB")
-      (if #de "Alle Pakete, 550 MB" "All packages, 550 MB"))
+      (if #de "Paketbündel aus einem Ordner (schnell)" "Package bundles from a directory (fast)")
+      (if #de "Einzeln aus dem Internet (langsam)" "Single packages from the internet (slow)"))
     (default 0)))
 
-(set #langs
-  (askoptions
-    (prompt
-      (if #de
-        "Weitere Sprachen und Schriften (Englisch ist immer dabei):"
-        "More languages and fonts (English is always included):"))
-    (help
-      (if #de
-        (cat "Jede Sprache bringt Silbentrennung, Babel-Unterstützung und ihre "
-             "Schriften mit. Die Größen gelten zusätzlich zu Paper/Abschlussarbeit; "
-             "mit \"Alle Pakete\" sind Kyrillisch, Griechisch und CJK kleiner, "
-             "weil sich die Schriften überschneiden.\n\n"
-             "Japanisch geht nur mit lualatex (luatexja); pLaTeX gibt es nicht.\n\n"
-             "Beliebte Schriften: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
-             "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
-             "Alle Zusatzschriften: über 400 Schriftfamilien. Meist braucht man nur eine; "
-             "die lädt man besser einzeln in der TeX-Shell, z. B.: tlinst install noto")
-        (cat "Each language brings hyphenation, babel support and its fonts. The "
-             "sizes are in addition to Paper/thesis; with \"All packages\" Cyrillic, "
-             "Greek and CJK are smaller, since the fonts overlap.\n\n"
-             "Japanese works with lualatex only (luatexja); there is no pLaTeX.\n\n"
-             "Popular fonts: newtx (Times), Libertinus, STIX2, Source Sans/Serif/Code "
-             "Pro, Inconsolata, EB Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
-             "All extra fonts: more than 400 font families. Usually one of them is "
-             "needed; better load it alone in the TeX-Shell, e.g.: tlinst install noto")))
-    (choices
-      (if #de "Europäische Sprachen (lateinische Schrift, mit Deutsch), 11 MB"
-              "European languages (Latin script, with German), 11 MB")
-      (if #de "Kyrillisch, 68 MB" "Cyrillic, 68 MB")
-      (if #de "Griechisch, 66 MB" "Greek, 66 MB")
-      (if #de "Arabisch, Hebräisch, Indisch und weitere, 35 MB"
-              "Arabic, Hebrew, Indic and others, 35 MB")
-      (if #de "Chinesisch, 130 MB" "Chinese, 130 MB")
-      (if #de "Japanisch (nur lualatex), 144 MB" "Japanese (lualatex only), 144 MB")
-      (if #de "Koreanisch, 134 MB" "Korean, 134 MB")
-      (if #de "Beliebte Schriften (newtx, Libertinus, STIX2 u.a.), 53 MB"
-              "Popular fonts (newtx, Libertinus, STIX2 and others), 53 MB")
-      (if #de "Alle Zusatzschriften, 650 MB" "All extra fonts, 650 MB"))
-    (default 0)))
-
-(set #src
-  (askchoice
-    (prompt (if #de "Woher sollen die Pakete kommen?" "Where should the packages come from?"))
-    (help
-      (if #de
-        (cat "Internet: der eingefrorene Stand von TeX Live 2025 im Archiv der "
-             "University of Utah, über HTTP (ein TCP/IP-Stack muss laufen).\n\n"
-             "Anderer Server: ein anderer Spiegel desselben Ordners "
-             "(.../texlive/2025/tlnet-final), nur http://.\n\n"
-             "Lokaler Ordner: eine Kopie von tlnet-final (mit dem Unterordner "
-             "archive), z. B. am PC heruntergeladen.")
-        (cat "Internet: the frozen TeX Live 2025 in the archive of the University "
-             "of Utah, over HTTP (a TCP/IP stack must be running).\n\n"
-             "Other server: another mirror of the same directory "
-             "(.../texlive/2025/tlnet-final), http:// only.\n\n"
-             "Local directory: a copy of tlnet-final (with its archive "
-             "subdirectory), e.g. downloaded on a PC.")))
-    (choices
-      "Internet: ftp.math.utah.edu"
-      (if #de "Anderer Server" "Other server")
-      (if #de "Lokaler Ordner" "Local directory"))
-    (default 0)))
-
-(set #repo "")
-(if (= #src 1)
-  (set #repo
-    (cat " --repository "
-      (askstring
-        (prompt (if #de "Adresse des Servers (tlnet-final von 2025):" "Server address (tlnet-final of 2025):"))
-        (help (if #de "Nur http://, kein https://." "Only http://, no https://."))
-        (default "http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final")))))
-(if (= #src 2)
-  (set #repo
-    (cat " --repository \""
-      (askdir
-        (prompt (if #de "Ordner tlnet-final (mit archive darin):" "Directory tlnet-final (with archive in it):"))
-        (help (if #de "Der Ordner, in dem archive/ liegt." "The directory that holds archive/."))
-        (default "RAM:"))
-      "\"")))
-
-(set #pkgs "")
-(if (= #scheme 0) (set #pkgs "scheme-basic"))
-(if (= #scheme 1)
-  (set #pkgs
-    (cat "scheme-basic collection-latexrecommended collection-latexextra "
-         "collection-pictures collection-fontsrecommended collection-bibtexextra "
-         "collection-mathscience")))
-; scheme-full without the languages and collection-fontsextra
-(if (= #scheme 2)
-  (set #pkgs
-    (cat "scheme-basic collection-langenglish collection-bibtexextra collection-binextra "
-         "collection-fontsrecommended collection-fontutils collection-formatsextra "
-         "collection-games collection-humanities collection-latexextra "
-         "collection-latexrecommended collection-luatex collection-mathscience "
-         "collection-metapost collection-music collection-pictures "
-         "collection-plaingeneric collection-pstricks collection-publishers")))
-(if (IN #langs 0)
-  (set #pkgs
-    (cat #pkgs " collection-langgerman collection-langfrench collection-langitalian"
-         " collection-langspanish collection-langportuguese collection-langpolish"
-         " collection-langczechslovak collection-langeuropean")))
-(if (IN #langs 1) (set #pkgs (cat #pkgs " collection-langcyrillic")))
-(if (IN #langs 2) (set #pkgs (cat #pkgs " collection-langgreek")))
-(if (IN #langs 3) (set #pkgs (cat #pkgs " collection-langarabic collection-langother")))
-(if (IN #langs 4) (set #pkgs (cat #pkgs " collection-langchinese")))
-(if (IN #langs 5) (set #pkgs (cat #pkgs " collection-langjapanese")))
-(if (IN #langs 6) (set #pkgs (cat #pkgs " collection-langkorean")))
-(if (IN #langs 7)
-  (set #pkgs
-    (cat #pkgs " newtx newtxtt libertinus libertinus-type1 libertinus-otf"
-         " libertinus-fonts inconsolata sourcesanspro sourcecodepro sourceserifpro"
-         " stix2-otf stix2-type1 ebgaramond kpfonts mlmodern iwona fontawesome")))
-(if (IN #langs 8) (set #pkgs (cat #pkgs " collection-fontsextra")))
-
-(message
-  (if #de
-    (cat "Jetzt werden die Pakete installiert. Ein Fenster zeigt den Fortschritt.\n\n"
-         "Danach werden die Formate und die Schriftenliste für LuaLaTeX gebaut: "
-         "auf einem schnellen Amiga einige Minuten, auf einem 68030 deutlich länger.\n\n"
-         "Bricht etwas ab, das Skript einfach noch einmal starten: "
-         "Fertige Pakete werden nicht neu geladen.")
-    (cat "The packages are installed now. A window shows the progress.\n\n"
-         "Afterwards the formats and LuaLaTeX's font list are built: a few minutes "
-         "on a fast Amiga, much longer on a 68030.\n\n"
-         "If something breaks off, just start this script again: packages that are "
-         "done are not loaded again.")))
-
-; the list goes into a file: AmigaDOS takes no command lines of this length
-(if (exists "T:TeX-Packages") (delete "T:TeX-Packages" (safe)))
-(textfile
-  (dest "T:TeX-Packages")
-  (append #pkgs)
-  (safe))
-
-(working (if #de "Installiere TeX-Live-Pakete ..." "Installing TeX Live packages ..."))
-(set #rc
-  (run
-    (cat "TeX:bin/m68k-amigaos/luahbtex --luaonly TeX:tlpkg/tlinst.lua" #repo
-         " --list T:TeX-Packages install"
-         " >\"CON:0/20/640/220/TeX Live/AUTO/WAIT/CLOSE\"")))
+(if (= #how 0) (P_BUNDLES) (P_NET))
 
 (if (> #rc 0)
   (message

@@ -20,6 +20,8 @@
                  path like TeX: works
      -x prefix   skip the files whose names start with prefix (e.g. tlpkg/:
                  tlmgr's own files)
+     -p          show the progress (a line every 1000 files), for big
+                 archives
 
    Exit code: 0 ok, 5 (WARN) checksum mismatch, 10 (ERROR) other errors.
    Plain C with stdio; no Amiga-specific code apart from path joining, so
@@ -143,6 +145,7 @@ octal (const char *p, int len)
 
 static char destdir[1024] = "";
 static const char *skip_prefix = NULL;
+static int progress = 0;
 
 /* destdir + "/" + rel; an Amiga device name ("TeX:") needs no slash */
 static void
@@ -371,6 +374,10 @@ untar (FILE *list)
       if (list)
         fprintf (list, "%s\n", name);
       files++;
+      if (progress && files % 1000 == 0) {
+        printf ("  %d files\n", files);
+        fflush (stdout);
+      }
     }
   }
   return files;
@@ -406,6 +413,8 @@ main (int argc, char **argv)
       listname = argv[++i];
     else if (strcmp (argv[i], "-d") == 0 && i + 1 < argc)
       snprintf (destdir, sizeof destdir, "%s", argv[++i]);
+    else if (strcmp (argv[i], "-p") == 0)
+      progress = 1;
     else if (strcmp (argv[i], "-x") == 0 && i + 1 < argc)
       skip_prefix = argv[++i];
     else if (argv[i][0] == '-' || file)
