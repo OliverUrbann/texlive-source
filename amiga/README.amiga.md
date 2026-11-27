@@ -6,9 +6,11 @@ code is laid out so they can be added (see "Other Amiga systems").
 
 A ready package is on the
 [releases page](https://github.com/OliverUrbann/texlive-source/releases):
-the programs and a package installer (about 6 MB), and package bundles
-(`TeXLive2025-*.tar.xz`). Unpack the core anywhere, put the bundles you
-want in a directory, double-click `Install-Packages`, then `TeX-Shell`. Its `ReadMe` (German and English) explains the use;
+`TeXLive2025.lha` (36 MB, also on Aminet) with the programs, the package
+installer and a minimal LaTeX, and package bundles (`TeXLive2025-*.tar.xz`)
+for more. Unpack the archive anywhere and double-click `TeX-Shell`; for
+more packages put bundles in a directory and double-click
+`Install-Packages`. Its `ReadMe` (German and English) explains the use;
 this file is about the port itself.
 
 ## Programs

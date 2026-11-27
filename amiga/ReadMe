@@ -15,9 +15,8 @@ Installation
   2. Für mehr Pakete die Paketbündel herunterladen, die man braucht
      (z. B. am PC), von
        https://github.com/OliverUrbann/texlive-source/releases
-     Minimal ist schon enthalten; für Paper und Abschlussarbeiten Paper,
-     für alles AllPackages, dazu nach Bedarf Sprachen und Schriften:
-       TeXLive2025-Minimal.tar.xz       18 MB  LaTeX mit den Grundpaketen
+     Für Paper und Abschlussarbeiten Paper, für alles AllPackages, dazu
+     nach Bedarf Sprachen und Schriften:
        TeXLive2025-Paper.tar.xz        189 MB  für Paper/Abschlussarbeiten:
              empfohlene und weitere LaTeX-Pakete, TikZ/pgfplots,
              Mathematik/Informatik, BibTeX-Stile, Standardschriften
@@ -184,9 +183,8 @@ Installation
   2. For more packages, download the package bundles you need (e.g. on
      a PC) from
        https://github.com/OliverUrbann/texlive-source/releases
-     Minimal is included already; for papers and theses take Paper, for
-     everything AllPackages, plus languages and fonts as needed:
-       TeXLive2025-Minimal.tar.xz       18 MB  LaTeX with the base packages
+     For papers and theses take Paper, for everything AllPackages, plus
+     languages and fonts as needed:
        TeXLive2025-Paper.tar.xz        189 MB  for papers and theses:
              recommended and additional LaTeX packages, TikZ/pgfplots,
              mathematics/computer science, BibTeX styles, standard fonts

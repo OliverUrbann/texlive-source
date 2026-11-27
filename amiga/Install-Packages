@@ -55,7 +55,6 @@
                "be deleted.")))
       (default #root)))
 
-  (set #b0 (= 1 (exists (tackon #bdir "TeXLive2025-Minimal.tar.xz"))))
   (set #b1 (= 1 (exists (tackon #bdir "TeXLive2025-Paper.tar.xz"))))
   (set #b2 (= 1 (exists (tackon #bdir "TeXLive2025-AllPackages.tar.xz"))))
   (set #b3 (= 1 (exists (tackon #bdir "TeXLive2025-European.tar.xz"))))
@@ -68,20 +67,20 @@
   (set #b10 (= 1 (exists (tackon #bdir "TeXLive2025-PopularFonts.tar.xz"))))
   (set #b11 (= 1 (exists (tackon #bdir "TeXLive2025-AllFonts.tar.xz"))))
 
-  (if (= 0 (+ #b0 #b1 #b2 #b3 #b4 #b5 #b6 #b7 #b8 #b9 #b10 #b11))
+  (if (= 0 (+ #b1 #b2 #b3 #b4 #b5 #b6 #b7 #b8 #b9 #b10 #b11))
     (abort
       (if #de
         (cat "In " #bdir " liegen keine Paketbündel (TeXLive2025-...tar.xz).\n\n"
              "Die Bündel gibt es unter\n"
              "https://github.com/OliverUrbann/texlive-source/releases\n"
-             "Mindestens eins von Minimal, Paper oder AllPackages herunterladen, "
-             "dazu nach Bedarf Sprachen und Schriften, in einen Ordner legen und "
+             "Paper oder AllPackages herunterladen, dazu nach Bedarf Sprachen "
+             "und Schriften, in einen Ordner legen und "
              "Install-Packages noch einmal starten.")
         (cat "There are no package bundles (TeXLive2025-...tar.xz) in " #bdir ".\n\n"
              "The bundles are at\n"
              "https://github.com/OliverUrbann/texlive-source/releases\n"
-             "Download at least one of Minimal, Paper or AllPackages, plus languages "
-             "and fonts as needed, put them in a directory and start "
+             "Download Paper or AllPackages, plus languages and fonts as needed, "
+             "put them in a directory and start "
              "Install-Packages again."))))
 
   (set #miss (if #de " - fehlt" " - missing"))
@@ -93,10 +92,9 @@
           "Which bundles should be installed? (those present are ticked)"))
       (help
         (if #de
-          (cat "Minimal, Paper und Alle Pakete schließen einander ein: eins davon "
-               "genügt (Alle Pakete enthält Paper, Paper enthält Minimal). Die "
-               "Sprachen und Schriften passen zu jedem der drei.\n\n"
-               "Minimal: LaTeX mit den Grundpaketen.\n"
+          (cat "Ein minimales LaTeX ist schon da (aus dem Archiv). Alle Pakete "
+               "enthält Paper: eins von beiden genügt. Die Sprachen und Schriften "
+               "passen zu allem.\n\n"
                "Paper: dazu die empfohlenen und weiteren LaTeX-Pakete, TikZ/pgfplots, "
                "Mathematik/Informatik, BibTeX-Stile, Standardschriften.\n"
                "Alle Pakete: alles außer fremden Sprachen und den Zusatzschriften.\n\n"
@@ -104,10 +102,9 @@
                "Schriften: newtx, Libertinus, STIX2, Source Pro, Inconsolata, EB "
                "Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
                "Fehlt ein Bündel, kann man es auch später dazu installieren.")
-          (cat "Minimal, Paper and All packages include each other: one of them "
-               "is enough (All packages holds Paper, Paper holds Minimal). The "
-               "languages and fonts go with any of the three.\n\n"
-               "Minimal: LaTeX with the base packages.\n"
+          (cat "A minimal LaTeX is there already (from the archive). All packages "
+               "holds Paper: one of the two is enough. The languages and fonts "
+               "go with anything.\n\n"
                "Paper: plus the recommended and additional LaTeX packages, "
                "TikZ/pgfplots, mathematics/computer science, BibTeX styles, standard fonts.\n"
                "All packages: everything except other languages and the extra fonts.\n\n"
@@ -116,7 +113,6 @@
                "Garamond, kpfonts, MLModern, Iwona, FontAwesome.\n\n"
                "A bundle that is missing can be installed later as well.")))
       (choices
-        (cat "Minimal (LaTeX), 18 MB" (if #b0 "" #miss))
         (cat (if #de "Paper/Abschlussarbeit, 189 MB" "Paper/thesis, 189 MB") (if #b1 "" #miss))
         (cat (if #de "Alle Pakete, 547 MB" "All packages, 547 MB") (if #b2 "" #miss))
         (cat (if #de "Europäische Sprachen (mit Deutsch), 11 MB" "European languages (with German), 11 MB") (if #b3 "" #miss))
@@ -129,36 +125,31 @@
         (cat (if #de "Beliebte Schriften, 52 MB" "Popular fonts, 52 MB") (if #b10 "" #miss))
         (cat (if #de "Alle Zusatzschriften, 676 MB" "All extra fonts, 676 MB") (if #b11 "" #miss)))
       (default
-        (+ (if #b0 1 0) (if #b1 2 0) (if #b2 4 0) (if #b3 8 0) (if #b4 16 0)
-           (if #b5 32 0) (if #b6 64 0) (if #b7 128 0) (if #b8 256 0)
-           (if #b9 512 0) (if #b10 1024 0) (if #b11 2048 0)))))
+        (+ (if #b1 1 0) (if #b2 2 0) (if #b3 4 0) (if #b4 8 0)
+           (if #b5 16 0) (if #b6 32 0) (if #b7 64 0) (if #b8 128 0)
+           (if #b9 256 0) (if #b10 512 0) (if #b11 1024 0)))))
 
-  ; only what is there and ticked; of the three bases only the largest
+  ; only what is there and ticked; Minimal came with the archive, and of
+  ; Paper and All packages only the larger one is needed
   (set #list "")
-  (set #base 0)
-  (if (AND (IN #sel 2) #b2)
-    (set #base 3)
-    (if (AND (IN #sel 1) #b1)
-      (set #base 2)
-      (if (AND (IN #sel 0) #b0) (set #base 1))))
-  (if (= #base 3) (set #list (cat (tackon #bdir "TeXLive2025-AllPackages.tar.xz") "\n")))
-  (if (= #base 2) (set #list (cat (tackon #bdir "TeXLive2025-Paper.tar.xz") "\n")))
-  (if (= #base 1) (set #list (cat (tackon #bdir "TeXLive2025-Minimal.tar.xz") "\n")))
-  (if (= #base 0)
-    (if (not (exists "TeX:texmf-dist/tex/latex/base/latex.ltx"))
-      (abort
-        (if #de
-          "Eins der Bündel Minimal, Paper oder Alle Pakete wird gebraucht (die Sprachen und Schriften bauen darauf auf)."
-          "One of the bundles Minimal, Paper or All packages is needed (the languages and fonts build on it)."))))
-  (if (AND (IN #sel 3) #b3) (set #list (cat #list (tackon #bdir "TeXLive2025-European.tar.xz") "\n")))
-  (if (AND (IN #sel 4) #b4) (set #list (cat #list (tackon #bdir "TeXLive2025-Cyrillic.tar.xz") "\n")))
-  (if (AND (IN #sel 5) #b5) (set #list (cat #list (tackon #bdir "TeXLive2025-Greek.tar.xz") "\n")))
-  (if (AND (IN #sel 6) #b6) (set #list (cat #list (tackon #bdir "TeXLive2025-ArabicIndic.tar.xz") "\n")))
-  (if (AND (IN #sel 7) #b7) (set #list (cat #list (tackon #bdir "TeXLive2025-Chinese.tar.xz") "\n")))
-  (if (AND (IN #sel 8) #b8) (set #list (cat #list (tackon #bdir "TeXLive2025-Japanese.tar.xz") "\n")))
-  (if (AND (IN #sel 9) #b9) (set #list (cat #list (tackon #bdir "TeXLive2025-Korean.tar.xz") "\n")))
-  (if (AND (IN #sel 10) #b10) (set #list (cat #list (tackon #bdir "TeXLive2025-PopularFonts.tar.xz") "\n")))
-  (if (AND (IN #sel 11) #b11) (set #list (cat #list (tackon #bdir "TeXLive2025-AllFonts.tar.xz") "\n")))
+  (if (AND (IN #sel 1) #b2)
+    (set #list (cat (tackon #bdir "TeXLive2025-AllPackages.tar.xz") "\n"))
+    (if (AND (IN #sel 0) #b1)
+      (set #list (cat (tackon #bdir "TeXLive2025-Paper.tar.xz") "\n"))))
+  (if (not (exists "TeX:texmf-dist/tex/latex/base/latex.ltx"))
+    (abort
+      (if #de
+        "Das minimale LaTeX aus dem Archiv fehlt (TeX:texmf-dist). Das Archiv TeXLive2025.lha noch einmal auspacken."
+        "The minimal LaTeX of the archive is missing (TeX:texmf-dist). Unpack the archive TeXLive2025.lha again.")))
+  (if (AND (IN #sel 2) #b3) (set #list (cat #list (tackon #bdir "TeXLive2025-European.tar.xz") "\n")))
+  (if (AND (IN #sel 3) #b4) (set #list (cat #list (tackon #bdir "TeXLive2025-Cyrillic.tar.xz") "\n")))
+  (if (AND (IN #sel 4) #b5) (set #list (cat #list (tackon #bdir "TeXLive2025-Greek.tar.xz") "\n")))
+  (if (AND (IN #sel 5) #b6) (set #list (cat #list (tackon #bdir "TeXLive2025-ArabicIndic.tar.xz") "\n")))
+  (if (AND (IN #sel 6) #b7) (set #list (cat #list (tackon #bdir "TeXLive2025-Chinese.tar.xz") "\n")))
+  (if (AND (IN #sel 7) #b8) (set #list (cat #list (tackon #bdir "TeXLive2025-Japanese.tar.xz") "\n")))
+  (if (AND (IN #sel 8) #b9) (set #list (cat #list (tackon #bdir "TeXLive2025-Korean.tar.xz") "\n")))
+  (if (AND (IN #sel 9) #b10) (set #list (cat #list (tackon #bdir "TeXLive2025-PopularFonts.tar.xz") "\n")))
+  (if (AND (IN #sel 10) #b11) (set #list (cat #list (tackon #bdir "TeXLive2025-AllFonts.tar.xz") "\n")))
   (if (= #list "")
     (abort (if #de "Kein vorhandenes Bündel ausgewählt." "No bundle that is present was selected.")))
 
