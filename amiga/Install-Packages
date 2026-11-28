@@ -40,34 +40,26 @@
 (message
   (if #de
     (cat "So läuft der Hase\n\n"
-         "Ein minimales LaTeX hast du schon: TeX-Shell anklicken (beim ersten "
-         "Mal werden kurz die Formate gebacken), pdflatex tippen, fertig.\n\n"
-         "Willst du mehr aus TeX Live 2025, gibt es zwei Wege:\n\n"
-         "1. Paketbündel - der schnelle Weg. Ein paar dicke Dateien "
-         "TeXLive2025-....tar.xz von\n"
+         "Ein minimales LaTeX ist schon drin: TeX-Shell starten, pdflatex "
+         "tippen, fertig.\n\n"
+         "Für mehr gibt es zwei Wege:\n\n"
+         "1. Paketbündel (schnell): die Dateien TeXLive2025-*.tar.xz von\n"
          "github.com/OliverUrbann/texlive-source/releases\n"
-         "Runterladen (z. B. am PC), in einen Ordner werfen, den Rest sucht sich "
-         "das Skript selbst.\n\n"
-         "2. Einzeln aus dem Internet - der Amiga holt jedes Paket selbst ab. "
-         "Für ein, zwei Pakete prima. Für eine große Auswahl: Achtung, das "
-         "dauert verflucht ewig (Tausende Pakete, Stunden).\n\n"
-         "Danach suchst du dir Pakete, Sprachen und Schriften aus, der Rest "
-         "läuft von allein. Später mehr nachlegen? Skript einfach wieder "
-         "starten.")
+         "herunterladen und in einen Ordner legen.\n\n"
+         "2. Einzeln aus dem Internet: für ein paar Pakete prima, für viele "
+         "dauert es verflucht ewig.\n\n"
+         "Danach wählst du Pakete, Sprachen und Schriften.")
     (cat "Here's the deal\n\n"
-         "You already have a minimal LaTeX: click TeX-Shell (the first time it "
-         "quickly bakes the formats), type pdflatex, done.\n\n"
-         "Want more of TeX Live 2025? Two ways:\n\n"
-         "1. Package bundles - the fast lane. A few fat files "
-         "TeXLive2025-....tar.xz from\n"
+         "A minimal LaTeX is already in: start the TeX-Shell, type pdflatex, "
+         "done.\n\n"
+         "For more there are two ways:\n\n"
+         "1. Package bundles (fast): download the files TeXLive2025-*.tar.xz "
+         "from\n"
          "github.com/OliverUrbann/texlive-source/releases\n"
-         "Download them (e.g. on a PC), drop them in a directory, this script "
-         "picks them up from there.\n\n"
-         "2. Single packages from the internet - the Amiga fetches every package "
-         "itself. Great for one or two. For a big selection: be warned, it "
-         "takes forever (thousands of packages, hours).\n\n"
-         "Then pick packages, languages and fonts, the rest runs on its own. "
-         "Want more later? Just start this script again.")))
+         "and put them in a directory.\n\n"
+         "2. Single packages from the internet: fine for a few, for many it "
+         "takes forever.\n\n"
+         "Then you pick packages, languages and fonts.")))
 
 ; ---- page 2: which way -----------------------------------------------------
 
@@ -76,7 +68,7 @@
     (prompt (if #de "Wie sollen die Pakete installiert werden?" "How should the packages be installed?"))
     (help
       (if #de
-        (cat "Paketbündel: vorher von der GitHub-Seite runterladen, dann geht's "
+        (cat "Paketbündel: vorher von der GitHub-Seite herunterladen, dann geht's "
              "flott.\n\n"
              "Einzeln aus dem Internet: direkt aus dem TeX-Live-Archiv der Uni "
              "Utah, per HTTP - ein TCP/IP-Stack muss laufen. Bei vielen Paketen: "
@@ -103,8 +95,8 @@
     (askdir
       (prompt
         (if #de
-          "In welchem Ordner liegen die Paketbündel (TeXLive2025-....tar.xz)?"
-          "In which directory are the package bundles (TeXLive2025-....tar.xz)?"))
+          "In welchem Ordner liegen die Paketbündel (TeXLive2025-*.tar.xz)?"
+          "In which directory are the package bundles (TeXLive2025-*.tar.xz)?"))
       (help
         (if #de
           (cat "Die Bündel gibt's unter\n"
@@ -134,13 +126,13 @@
     (if (= 0 (+ #b1 #b2 #b3 #b4 #b5 #b6 #b7 #b8 #b9 #b10 #b11))
       (abort
         (if #de
-          (cat "In " #bdir " ist kein einziges Paketbündel (TeXLive2025-....tar.xz). "
+          (cat "In " #bdir " ist kein einziges Paketbündel (TeXLive2025-*.tar.xz). "
                "Gähnende Leere.\n\n"
                "Die Bündel gibt's unter\n"
                "https://github.com/OliverUrbann/texlive-source/releases\n"
-               "Runterladen, in einen Ordner legen, Install-Packages nochmal "
+               "Herunterladen, in einen Ordner legen, Install-Packages nochmal "
                "starten.")
-          (cat "Not a single package bundle (TeXLive2025-....tar.xz) in " #bdir ". "
+          (cat "Not a single package bundle (TeXLive2025-*.tar.xz) in " #bdir ". "
                "Nothing but tumbleweed.\n\n"
                "The bundles are at\n"
                "https://github.com/OliverUrbann/texlive-source/releases\n"
@@ -395,7 +387,7 @@
   (message
     (if #de
       (cat "Angekreuzt, aber nicht im Ordner:" #skip "\n\nDie lassen wir aus. "
-           "Runterladen und das Skript nochmal starten, dann sind sie dabei.")
+           "Herunterladen und das Skript nochmal starten, dann sind sie dabei.")
       (cat "Ticked, but not in the directory:" #skip "\n\nWe'll skip those. "
            "Download them and start this script again, and they're in."))))
 
@@ -404,23 +396,17 @@
 
 (message
   (if #de
-    (cat "Los geht's! Ein Fenster zeigt, was passiert.\n\n"
-         "Danach backt TeX seine Formate und lualatex baut die Schriftenliste: "
-         "auf einem flotten Amiga ein paar Minuten, auf einem 68030 deutlich "
-         "länger, mit allen Zusatzschriften eher eine Nacht.\n\n"
-         "Wenig RAM (128 MB)? Dann am besten nichts anderes laufen lassen: Das "
-         "lualatex-Format will beim Bauen einen großen Speicherbrocken am "
-         "Stück.\n\n"
-         "Geht was schief: Skript einfach nochmal starten, Fertiges wird nicht "
-         "doppelt gemacht.")
-    (cat "Here we go! A window shows what's happening.\n\n"
-         "Afterwards TeX bakes its formats and lualatex builds its font list: "
-         "a few minutes on a quick Amiga, much longer on a 68030, more like a "
-         "night with all extra fonts.\n\n"
-         "Low on RAM (128 MB)? Then better run nothing else: building the "
-         "lualatex format wants one big chunk of memory.\n\n"
-         "If something goes wrong: just start this script again, finished stuff "
-         "isn't done twice.")))
+    (cat "Los geht's! Ein Fenster zeigt den Fortschritt.\n\n"
+         "Danach werden die Formate und die Schriftenliste für lualatex gebaut: "
+         "auf einem flotten Amiga ein paar Minuten, mit allen Zusatzschriften "
+         "eher eine Nacht.\n\n"
+         "Mit 128 MB RAM nebenher wenig laufen lassen. Geht was schief, das "
+         "Skript einfach nochmal starten.")
+    (cat "Here we go! A window shows the progress.\n\n"
+         "Afterwards the formats and lualatex's font list are built: a few "
+         "minutes on a quick Amiga, more like a night with all extra fonts.\n\n"
+         "With 128 MB RAM run little else meanwhile. If something goes wrong, "
+         "just start this script again.")))
 
 ; the list goes into a file: AmigaDOS takes no long command lines
 (if (exists "T:TeX-Packages") (delete "T:TeX-Packages" (safe)))
