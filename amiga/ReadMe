@@ -159,6 +159,16 @@ Weitere Pakete
   texmf-local/tex/latex/meinpaket/). Die TeX-Shell findet sie beim
   nächsten Start; sonst "mktexlsr TeX:texmf-local".
 
+Wenig Speicher, "not enough memory"
+  128 MB reichen, aber das lualatex-Format braucht beim Bauen kurz einen
+  großen zusammenhängenden Speicherblock. Ist der Speicher nach einer
+  Weile zerstückelt oder laufen viele andere Programme, bricht
+  "lualatex.fmt" mit "not enough memory for buffer allocation" ab
+  (pdflatex ist davon nicht betroffen). Dann: Amiga neu starten, nichts
+  weiter laufen lassen, TeX-Shell öffnen und
+    Execute TeX:MakeFormats TeX:
+  Mit 256 MB passiert das kaum.
+
 Speicher anpassen
   TeX/texmf.cnf. Nach Änderungen an main_memory, hash_extra, trie_size
   oder hyph_size die Formate neu erzeugen: in der TeX-Shell
@@ -322,6 +332,15 @@ More packages
   TeX/texmf-local, with the same layout as texmf-dist (e.g.
   texmf-local/tex/latex/mypackage/). The TeX-Shell finds them the next
   time it starts; otherwise run "mktexlsr TeX:texmf-local".
+
+Little memory, "not enough memory"
+  128 MB are enough, but building the lualatex format needs one big
+  piece of memory for a moment. When memory is fragmented after a while
+  or many other programs run, "lualatex.fmt" stops with "not enough
+  memory for buffer allocation" (pdflatex is not affected). Then: reboot,
+  run nothing else, open the TeX-Shell and
+    Execute TeX:MakeFormats TeX:
+  With 256 MB this hardly happens.
 
 Memory settings
   TeX/texmf.cnf. After changing main_memory, hash_extra, trie_size or

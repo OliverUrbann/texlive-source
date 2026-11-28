@@ -46,7 +46,10 @@ Requirements
   68020 or better (68030+ recommended, a Vampire or an emulator with JIT
   is comfortable), AmigaOS 3.0 or later.
   Memory: about 56 MB free for pdflatex, 128 MB for lualatex, 256 MB for
-  Chinese/Japanese/Korean or several scripts in one document.
+  Chinese/Japanese/Korean or several scripts in one document. With 128 MB,
+  build the formats with little else running: building lualatex's format
+  needs one big piece of memory (if it stops with "not enough memory",
+  reboot and run "Execute TeX:MakeFormats TeX:" in the TeX-Shell).
   Disk: about 110 MB for this archive unpacked; Paper adds about 600 MB.
   ixemul.library 80.1 is included (in TeX/Libs; nothing is copied into
   the system).
@@ -124,7 +127,10 @@ Voraussetzungen
   Emulator mit JIT), AmigaOS 3.0 oder neuer.
   Speicher: etwa 56 MB frei fuer pdflatex, 128 MB fuer lualatex, 256 MB
   fuer Chinesisch/Japanisch/Koreanisch oder mehrere Schriftsysteme in
-  einem Dokument.
+  einem Dokument. Mit 128 MB die Formate bauen, waehrend wenig anderes
+  laeuft: das lualatex-Format braucht dabei einen grossen Speicherblock
+  (bricht es mit "not enough memory" ab: neu starten und in der
+  TeX-Shell "Execute TeX:MakeFormats TeX:").
   Platte: etwa 110 MB fuer dieses Archiv ausgepackt; Paper braucht etwa
   600 MB mehr.
   ixemul.library 80.1 liegt bei (in TeX/Libs; es wird nichts ins System

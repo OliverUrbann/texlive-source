@@ -662,6 +662,8 @@ local function copy_programs()
   end
 end
 
+local formats_failed = false
+
 local function configure(force)
   if opt.noconfig then return end
   say("Configuring ...")
@@ -673,8 +675,16 @@ local function configure(force)
   mktexlsr(VAR)
   if opt.formats and (force or changed.formats) then
     say("  formats (this takes a while)")
-    if not run("Execute " .. quote(J(R, "MakeFormats")) .. " " .. quote(R)) then
-      say("  building the formats failed: run Execute TeX:MakeFormats to see why")
+    run("Execute " .. quote(J(R, "MakeFormats")) .. " " .. quote(R))
+    local missing = {}
+    for _, f in ipairs({ "pdftex/pdflatex.fmt", "luahbtex/lualatex.fmt" }) do
+      if not exists(J(VAR, "web2c/" .. f)) then missing[#missing + 1] = f:match("[^/]+$") end
+    end
+    if #missing > 0 then
+      formats_failed = true
+      say("  NOT BUILT: ", table.concat(missing, " "))
+      say("  With little memory (\"not enough memory\"): reboot, run nothing else,")
+      say("  open the TeX-Shell and type:  Execute TeX:MakeFormats TeX:")
     end
   end
   if opt.fontlist and (force or changed.fonts) then
@@ -742,3 +752,6 @@ elseif cmd == "list" then list(names[1])
 elseif cmd == "info" then info(names)
 elseif cmd == "config" then configure(true)
 else die("unknown command " .. cmd) end
+
+-- a format could not be built: WARN, so that the Installer says so
+if formats_failed then os.exit(5) end
